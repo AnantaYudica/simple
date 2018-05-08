@@ -16,6 +16,7 @@ public:
     Value();
     Value(const T& val);
     Value(const Value<K, T>& cpy);
+    Value(Value<K, T>&& mov);
 public:
     Value<K, T>& operator=(const T& val);
     Value<K, T>& operator=(const Value<K, T>& cpy);
@@ -37,6 +38,11 @@ Value<K, T>::Value(const T& val) :
 template<typename K, typename T>
 Value<K, T>::Value(const Value<K, T>& cpy) :
     m_value(cpy.m_value)
+{}
+
+template<typename K, typename T>
+Value<K, T>::Value(Value<K, T>&& mov) :
+     m_value(mov.m_value)
 {}
 
 template<typename K, typename T>
