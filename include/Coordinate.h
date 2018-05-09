@@ -2,7 +2,6 @@
 #define COORDINATE_H_
 
 #include <tuple>
-#include <array>
 
 #include "Value.h"
 
