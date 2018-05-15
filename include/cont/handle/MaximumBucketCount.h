@@ -1,5 +1,5 @@
-#ifndef CONTAINER_HANDLE_ASSIGN_H_
-#define CONTAINER_HANDLE_ASSIGN_H_
+#ifndef CONTAINER_HANDLE_MAXIMUM_BUCKET_COUNT_H_
+#define CONTAINER_HANDLE_MAXIMUM_BUCKET_COUNT_H_
 
 #include <type_traits>
 #include <functional>
@@ -11,41 +11,41 @@ namespace simple
 {
 namespace _helper
 {
-namespace _assign
+namespace _maximum_bucket_count
 {
 template<typename Tc, typename... Targs>
 static constexpr auto _IsHasFunctionMember0(Tc c) ->
-	decltype(c.assign(std::declval<Targs>()...), std::true_type());
+	decltype(c.max_bucket_count(std::declval<Targs>()...), std::true_type());
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionMember0(...);
 
 template<typename Tc, typename... Targs>
 static constexpr auto _IsHasFunctionMember1(Tc c) ->
-	decltype(c.Assign(std::declval<Targs>()...), std::true_type());
+	decltype(c.MaximumBucketCount(std::declval<Targs>()...), std::true_type());
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionMember1(...);
 
 template<typename Tc, typename... Targs>
 static constexpr auto _IsHasFunctionReference0(Tc c) ->
-	decltype(assign(c, std::declval<Targs>()...), std::true_type());
+	decltype(max_bucket_count(c, std::declval<Targs>()...), std::true_type());
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionReference0(...);
 
 template<typename Tc, typename... Targs>
 static constexpr auto _IsHasFunctionReference1(Tc c) ->
-	decltype(Assign(c, std::declval<Targs>()...), std::true_type());
+	decltype(MaximumBucketCount(c, std::declval<Targs>()...), std::true_type());
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionReference1(...);
 
 template<typename Tc, typename... Targs>
 static constexpr auto _IsHasFunctionPointer0(Tc c) ->
-	decltype(assign(&c, std::declval<Targs>()...), std::true_type());
+	decltype(max_bucket_count(&c, std::declval<Targs>()...), std::true_type());
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionPointer0(...);
 
 template<typename Tc, typename... Targs>
 static constexpr auto _IsHasFunctionPointer1(Tc c) ->
-	decltype(Assign(&c, std::declval<Targs>()...), std::true_type());
+	decltype(MaximumBucketCount(&c, std::declval<Targs>()...), std::true_type());
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionPointer1(...);
 
@@ -53,23 +53,23 @@ template<typename Tc, typename Tr, typename... Targs>
 struct _Validation
 {
 	static constexpr bool _HasFunctionMember0 =
-		decltype(simple::_helper::_assign::_IsHasFunctionMember0<Tc, Targs...>
-			(std::declval<Tc>()))::value;
+		decltype(simple::_helper::maximum_bucket_count::
+            _IsHasFunctionMember0<Tc, Targs...>(std::declval<Tc>()))::value;
 	static constexpr bool _HasFunctionMember1 =
-		decltype(simple::_helper::_assign::_IsHasFunctionMember1<Tc, Targs...>
-			(std::declval<Tc>()))::value;
+		decltype(simple::_helper::maximum_bucket_count::
+            _IsHasFunctionMember1<Tc, Targs...>(std::declval<Tc>()))::value;
 	static constexpr bool _HasFunctionReference0 =
-		decltype(simple::_helper::_assign::
+		decltype(simple::_helper::maximum_bucket_count::
 			_IsHasFunctionReference0<Tc, Targs...>(std::declval<Tc>()))::value;
 	static constexpr bool _HasFunctionReference1 =
-		decltype(simple::_helper::_assign::
+		decltype(simple::_helper::maximum_bucket_count::
 			_IsHasFunctionReference1<Tc, Targs...>(std::declval<Tc>()))::value;
 	static constexpr bool _HasFunctionPointer0 =
-		decltype(simple::_helper::_assign::_IsHasFunctionPointer0<Tc, Targs...>
-			(std::declval<Tc>()))::value;
+		decltype(simple::_helper::maximum_bucket_count::
+            _IsHasFunctionPointer0<Tc, Targs...>(std::declval<Tc>()))::value;
 	static constexpr bool _HasFunctionPointer1 =
-		decltype(simple::_helper::_assign::_IsHasFunctionPointer1<Tc, Targs...>
-			(std::declval<Tc>()))::value;
+		decltype(simple::_helper::maximum_bucket_count::
+            _IsHasFunctionPointer1<Tc, Targs...>(std::declval<Tc>()))::value;
 	static constexpr bool _HasFunction = (
 		_Validation<Tc, Tr, Targs...>::_HasFunctionMember0 ||
 		_Validation<Tc, Tr, Targs...>::_HasFunctionMember1 ||
@@ -86,7 +86,7 @@ struct _Call
 		_Validation<Tc, Tr, Targs...>::_HasFunctionMember0, Tr>::type
 		DefaultHandle(Tc& c, Targs... args)
 	{
-		return c.assign(args...);
+		return c.max_bucket_count(args...);
 	}
 
 	template<typename Tc, typename Tr, typename... Targs>
@@ -95,7 +95,7 @@ struct _Call
 		_Validation<Tc, Tr, Targs...>::_HasFunctionMember1, Tr>::type
 		DefaultHandle(Tc& c, Targs... args)
 	{
-		return c.Assign(args...);
+		return c.MaximumBucketCount(args...);
 	}
 
 	template<typename Tc, typename Tr, typename... Targs>
@@ -105,7 +105,7 @@ struct _Call
 		_Validation<Tc, Tr, Targs...>::_HasFunctionReference0, Tr>::type
 		DefaultHandle(Tc& c, Targs... args)
 	{
-		return assign(c, args...);
+		return max_bucket_count(c, args...);
 	}
 
 	template<typename Tc, typename Tr, typename... Targs>
@@ -116,7 +116,7 @@ struct _Call
 		_Validation<Tc, Tr, Targs...>::_HasFunctionReference1, Tr>::type
 		DefaultHandle(Tc& c, Targs... args)
 	{
-		return Assign(c, args...);
+		return MaximumBucketCount(c, args...);
 	}
 
 	template<typename Tc, typename Tr, typename... Targs>
@@ -128,7 +128,7 @@ struct _Call
 		_Validation<Tc, Tr, Targs...>::_HasFunctionPointer0, Tr>::type
 		DefaultHandle(Tc& c, Targs... args)
 	{
-		return assign(&c, args...);
+		return max_bucket_count(&c, args...);
 	}
 
 	template<typename Tc, typename Tr, typename... Targs>
@@ -141,7 +141,7 @@ struct _Call
 		_Validation<Tc, Tr, Targs...>::_HasFunctionPointer1, Tr>::type
 		DefaultHandle(Tc& c, Targs... args)
 	{
-		return Assign(&c, args...);
+		return MaximumBucketCount(&c, args...);
 	}
 
 	template<typename Tc, typename Tr, typename... Targs>
@@ -154,7 +154,8 @@ struct _Call
 		!_Validation<Tc, Tr, Targs...>::_HasFunctionPointer1, Tr>::type
 		DefaultHandle(Tc& c, Targs... args)
 	{
-		assert(!"do not have handle assign or Assign function ");
+		assert(!"do not have handle max_bucket_count or "
+            "MaximumBucketCount function ");
 	}
 };
 
@@ -167,81 +168,83 @@ namespace cont
 namespace handle
 {
 
-struct AssignKey;
+struct MaximumBucketCountKey;
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-class Assign : public simple::Handle<AssignKey, Tr, Tc&, Targs...>
+class MaximumBucketCount : public simple::Handle<MaximumBucketCountKey, Tr, Tc&, Targs...>
 {
 public:
 	typedef K KeyType;
 	typedef std::function<Tr(Tc&, Targs...)> HandleType;
 public:
-	Assign();
-	Assign(HandleType handle);
-	Assign(const Assign<K, Tc, Tr, Targs...>& cpy);
-	Assign(Assign<K, Tc, Tr, Targs...>&& mov);
+	MaximumBucketCount();
+	MaximumBucketCount(HandleType handle);
+	MaximumBucketCount(const MaximumBucketCount<K, Tc, Tr, Targs...>& cpy);
+	MaximumBucketCount(MaximumBucketCount<K, Tc, Tr, Targs...>&& mov);
 public:
-	Assign<K, Tc, Tr, Targs...>& 
-		operator=(const Assign<K, Tc, Tr, Targs...>& cpy);
-	Assign<K, Tc, Tr, Targs...>&
+	MaximumBucketCount<K, Tc, Tr, Targs...>& 
+		operator=(const MaximumBucketCount<K, Tc, Tr, Targs...>& cpy);
+	MaximumBucketCount<K, Tc, Tr, Targs...>&
 		operator=(HandleType handle);
 	Tr operator()(Tc& cont, Targs... val_args);
 	operator bool() const;
 };
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Assign<K, Tc, Tr, Targs...>::Assign()
+MaximumBucketCount<K, Tc, Tr, Targs...>::MaximumBucketCount()
 {
-	if (simple::_helper::_assign::_Validation<Tc, Tr, Targs...>::_HasFunction)
+	if (simple::_helper::maximum_bucket_count::
+        _Validation<Tc, Tr, Targs...>::_HasFunction)
 	{
-		Set(&simple::_helper::_assign::_Call::DefaultHandle<Tc, Tr, Targs...>);
+		Set(&simple::_helper::maximum_bucket_count::
+            _Call::DefaultHandle<Tc, Tr, Targs...>);
 	}
 }
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Assign<K, Tc, Tr, Targs...>::Assign(HandleType handle) :
-	simple::Handle<AssignKey, Tr, Tc&, Targs...>(handle)
+MaximumBucketCount<K, Tc, Tr, Targs...>::MaximumBucketCount(HandleType handle) :
+	simple::Handle<MaximumBucketCountKey, Tr, Tc&, Targs...>(handle)
 {}  
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Assign<K, Tc, Tr, Targs...>::
-	Assign(const Assign<K, Tc, Tr, Targs...>& cpy) :
-		simple::Handle<AssignKey, Tr, Tc&, Targs...>(cpy)
+MaximumBucketCount<K, Tc, Tr, Targs...>::
+	MaximumBucketCount(const MaximumBucketCount<K, Tc, Tr, Targs...>& cpy) :
+		simple::Handle<MaximumBucketCountKey, Tr, Tc&, Targs...>(cpy)
 {}
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Assign<K, Tc, Tr, Targs...>::
-	Assign(Assign<K, Tc, Tr, Targs...>&& mov) :
-		simple::Handle<AssignKey, Tr, Tc&, Targs...>(mov)
+MaximumBucketCount<K, Tc, Tr, Targs...>::
+	MaximumBucketCount(MaximumBucketCount<K, Tc, Tr, Targs...>&& mov) :
+		simple::Handle<MaximumBucketCountKey, Tr, Tc&, Targs...>(mov)
 {}
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Assign<K, Tc, Tr, Targs...>& Assign<K, Tc, Tr, Targs...>::
-	operator=(const Assign<K, Tc, Tr, Targs...>& cpy)
+MaximumBucketCount<K, Tc, Tr, Targs...>& MaximumBucketCount<K, Tc, Tr, Targs...>::
+	operator=(const MaximumBucketCount<K, Tc, Tr, Targs...>& cpy)
 {
-	simple::Handle<AssignKey, Tr, Tc&, Targs...>::operator=(cpy);
+	simple::Handle<MaximumBucketCountKey, Tr, Tc&, Targs...>::operator=(cpy);
 	return *this;
 }
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Assign<K, Tc, Tr, Targs...>& Assign<K, Tc, Tr, Targs...>::
+MaximumBucketCount<K, Tc, Tr, Targs...>& MaximumBucketCount<K, Tc, Tr, Targs...>::
 	operator=(HandleType handle)
 {
-	simple::Handle<AssignKey, Tr, Tc&, Targs...>::operator=(handle);
+	simple::Handle<MaximumBucketCountKey, Tr, Tc&, Targs...>::operator=(handle);
 	return *this;
 }
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Tr Assign<K, Tc, Tr, Targs...>::operator()(Tc& cont, Targs... val_args)
+Tr MaximumBucketCount<K, Tc, Tr, Targs...>::operator()(Tc& cont, Targs... val_args)
 {
-    return simple::Handle<AssignKey, Tr, Tc&, Targs...>
+    return simple::Handle<MaximumBucketCountKey, Tr, Tc&, Targs...>
 		::operator()(cont, val_args...);
 }
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Assign<K, Tc, Tr, Targs...>::operator bool() const
+MaximumBucketCount<K, Tc, Tr, Targs...>::operator bool() const
 {
-	return simple::Handle<AssignKey, Tr, Tc&, Targs...>::operator bool();
+	return simple::Handle<MaximumBucketCountKey, Tr, Tc&, Targs...>::operator bool();
 }
 
 }
@@ -250,4 +253,4 @@ Assign<K, Tc, Tr, Targs...>::operator bool() const
 
 }
 
-#endif //!CONTAINER_HANDLE_ASSIGN_H_
+#endif //!CONTAINER_HANDLE_MAXIMUM_BUCKET_COUNT_H_

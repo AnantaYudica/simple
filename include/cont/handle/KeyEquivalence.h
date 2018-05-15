@@ -1,5 +1,5 @@
-#ifndef CONTAINER_HANDLE_ASSIGN_H_
-#define CONTAINER_HANDLE_ASSIGN_H_
+#ifndef CONTAINER_HANDLE_KEY_EQUIVALENCE_H_
+#define CONTAINER_HANDLE_KEY_EQUIVALENCE_H_
 
 #include <type_traits>
 #include <functional>
@@ -11,41 +11,41 @@ namespace simple
 {
 namespace _helper
 {
-namespace _assign
+namespace _key_equivalence
 {
 template<typename Tc, typename... Targs>
 static constexpr auto _IsHasFunctionMember0(Tc c) ->
-	decltype(c.assign(std::declval<Targs>()...), std::true_type());
+	decltype(c.key_eq(std::declval<Targs>()...), std::true_type());
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionMember0(...);
 
 template<typename Tc, typename... Targs>
 static constexpr auto _IsHasFunctionMember1(Tc c) ->
-	decltype(c.Assign(std::declval<Targs>()...), std::true_type());
+	decltype(c.KeyEquivalence(std::declval<Targs>()...), std::true_type());
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionMember1(...);
 
 template<typename Tc, typename... Targs>
 static constexpr auto _IsHasFunctionReference0(Tc c) ->
-	decltype(assign(c, std::declval<Targs>()...), std::true_type());
+	decltype(key_eq(c, std::declval<Targs>()...), std::true_type());
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionReference0(...);
 
 template<typename Tc, typename... Targs>
 static constexpr auto _IsHasFunctionReference1(Tc c) ->
-	decltype(Assign(c, std::declval<Targs>()...), std::true_type());
+	decltype(KeyEquivalence(c, std::declval<Targs>()...), std::true_type());
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionReference1(...);
 
 template<typename Tc, typename... Targs>
 static constexpr auto _IsHasFunctionPointer0(Tc c) ->
-	decltype(assign(&c, std::declval<Targs>()...), std::true_type());
+	decltype(key_eq(&c, std::declval<Targs>()...), std::true_type());
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionPointer0(...);
 
 template<typename Tc, typename... Targs>
 static constexpr auto _IsHasFunctionPointer1(Tc c) ->
-	decltype(Assign(&c, std::declval<Targs>()...), std::true_type());
+	decltype(KeyEquivalence(&c, std::declval<Targs>()...), std::true_type());
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionPointer1(...);
 
@@ -53,23 +53,23 @@ template<typename Tc, typename Tr, typename... Targs>
 struct _Validation
 {
 	static constexpr bool _HasFunctionMember0 =
-		decltype(simple::_helper::_assign::_IsHasFunctionMember0<Tc, Targs...>
-			(std::declval<Tc>()))::value;
+		decltype(simple::_helper::_key_equivalence::
+            _IsHasFunctionMember0<Tc, Targs...>(std::declval<Tc>()))::value;
 	static constexpr bool _HasFunctionMember1 =
-		decltype(simple::_helper::_assign::_IsHasFunctionMember1<Tc, Targs...>
-			(std::declval<Tc>()))::value;
+		decltype(simple::_helper::_key_equivalence::
+            _IsHasFunctionMember1<Tc, Targs...>(std::declval<Tc>()))::value;
 	static constexpr bool _HasFunctionReference0 =
-		decltype(simple::_helper::_assign::
+		decltype(simple::_helper::_key_equivalence::
 			_IsHasFunctionReference0<Tc, Targs...>(std::declval<Tc>()))::value;
 	static constexpr bool _HasFunctionReference1 =
-		decltype(simple::_helper::_assign::
+		decltype(simple::_helper::_key_equivalence::
 			_IsHasFunctionReference1<Tc, Targs...>(std::declval<Tc>()))::value;
 	static constexpr bool _HasFunctionPointer0 =
-		decltype(simple::_helper::_assign::_IsHasFunctionPointer0<Tc, Targs...>
-			(std::declval<Tc>()))::value;
+		decltype(simple::_helper::_key_equivalence::
+            _IsHasFunctionPointer0<Tc, Targs...>(std::declval<Tc>()))::value;
 	static constexpr bool _HasFunctionPointer1 =
-		decltype(simple::_helper::_assign::_IsHasFunctionPointer1<Tc, Targs...>
-			(std::declval<Tc>()))::value;
+		decltype(simple::_helper::_key_equivalence::
+            _IsHasFunctionPointer1<Tc, Targs...>(std::declval<Tc>()))::value;
 	static constexpr bool _HasFunction = (
 		_Validation<Tc, Tr, Targs...>::_HasFunctionMember0 ||
 		_Validation<Tc, Tr, Targs...>::_HasFunctionMember1 ||
@@ -86,7 +86,7 @@ struct _Call
 		_Validation<Tc, Tr, Targs...>::_HasFunctionMember0, Tr>::type
 		DefaultHandle(Tc& c, Targs... args)
 	{
-		return c.assign(args...);
+		return c.key_eq(args...);
 	}
 
 	template<typename Tc, typename Tr, typename... Targs>
@@ -95,7 +95,7 @@ struct _Call
 		_Validation<Tc, Tr, Targs...>::_HasFunctionMember1, Tr>::type
 		DefaultHandle(Tc& c, Targs... args)
 	{
-		return c.Assign(args...);
+		return c.KeyEquivalence(args...);
 	}
 
 	template<typename Tc, typename Tr, typename... Targs>
@@ -105,7 +105,7 @@ struct _Call
 		_Validation<Tc, Tr, Targs...>::_HasFunctionReference0, Tr>::type
 		DefaultHandle(Tc& c, Targs... args)
 	{
-		return assign(c, args...);
+		return key_eq(c, args...);
 	}
 
 	template<typename Tc, typename Tr, typename... Targs>
@@ -116,7 +116,7 @@ struct _Call
 		_Validation<Tc, Tr, Targs...>::_HasFunctionReference1, Tr>::type
 		DefaultHandle(Tc& c, Targs... args)
 	{
-		return Assign(c, args...);
+		return KeyEquivalence(c, args...);
 	}
 
 	template<typename Tc, typename Tr, typename... Targs>
@@ -128,7 +128,7 @@ struct _Call
 		_Validation<Tc, Tr, Targs...>::_HasFunctionPointer0, Tr>::type
 		DefaultHandle(Tc& c, Targs... args)
 	{
-		return assign(&c, args...);
+		return key_eq(&c, args...);
 	}
 
 	template<typename Tc, typename Tr, typename... Targs>
@@ -141,7 +141,7 @@ struct _Call
 		_Validation<Tc, Tr, Targs...>::_HasFunctionPointer1, Tr>::type
 		DefaultHandle(Tc& c, Targs... args)
 	{
-		return Assign(&c, args...);
+		return KeyEquivalence(&c, args...);
 	}
 
 	template<typename Tc, typename Tr, typename... Targs>
@@ -154,7 +154,7 @@ struct _Call
 		!_Validation<Tc, Tr, Targs...>::_HasFunctionPointer1, Tr>::type
 		DefaultHandle(Tc& c, Targs... args)
 	{
-		assert(!"do not have handle assign or Assign function ");
+		assert(!"do not have handle key_eq or KeyEquivalence function ");
 	}
 };
 
@@ -167,81 +167,83 @@ namespace cont
 namespace handle
 {
 
-struct AssignKey;
+struct KeyEquivalenceKey;
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-class Assign : public simple::Handle<AssignKey, Tr, Tc&, Targs...>
+class KeyEquivalence : public simple::Handle<KeyEquivalenceKey, Tr, Tc&, Targs...>
 {
 public:
 	typedef K KeyType;
 	typedef std::function<Tr(Tc&, Targs...)> HandleType;
 public:
-	Assign();
-	Assign(HandleType handle);
-	Assign(const Assign<K, Tc, Tr, Targs...>& cpy);
-	Assign(Assign<K, Tc, Tr, Targs...>&& mov);
+	KeyEquivalence();
+	KeyEquivalence(HandleType handle);
+	KeyEquivalence(const KeyEquivalence<K, Tc, Tr, Targs...>& cpy);
+	KeyEquivalence(KeyEquivalence<K, Tc, Tr, Targs...>&& mov);
 public:
-	Assign<K, Tc, Tr, Targs...>& 
-		operator=(const Assign<K, Tc, Tr, Targs...>& cpy);
-	Assign<K, Tc, Tr, Targs...>&
+	KeyEquivalence<K, Tc, Tr, Targs...>& 
+		operator=(const KeyEquivalence<K, Tc, Tr, Targs...>& cpy);
+	KeyEquivalence<K, Tc, Tr, Targs...>&
 		operator=(HandleType handle);
 	Tr operator()(Tc& cont, Targs... val_args);
 	operator bool() const;
 };
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Assign<K, Tc, Tr, Targs...>::Assign()
+KeyEquivalence<K, Tc, Tr, Targs...>::KeyEquivalence()
 {
-	if (simple::_helper::_assign::_Validation<Tc, Tr, Targs...>::_HasFunction)
+	if (simple::_helper::_key_equivalence::
+        _Validation<Tc, Tr, Targs...>::_HasFunction)
 	{
-		Set(&simple::_helper::_assign::_Call::DefaultHandle<Tc, Tr, Targs...>);
+		Set(&simple::_helper::_key_equivalence::
+            _Call::DefaultHandle<Tc, Tr, Targs...>);
 	}
 }
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Assign<K, Tc, Tr, Targs...>::Assign(HandleType handle) :
-	simple::Handle<AssignKey, Tr, Tc&, Targs...>(handle)
+KeyEquivalence<K, Tc, Tr, Targs...>::KeyEquivalence(HandleType handle) :
+	simple::Handle<KeyEquivalenceKey, Tr, Tc&, Targs...>(handle)
 {}  
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Assign<K, Tc, Tr, Targs...>::
-	Assign(const Assign<K, Tc, Tr, Targs...>& cpy) :
-		simple::Handle<AssignKey, Tr, Tc&, Targs...>(cpy)
+KeyEquivalence<K, Tc, Tr, Targs...>::
+	KeyEquivalence(const KeyEquivalence<K, Tc, Tr, Targs...>& cpy) :
+		simple::Handle<KeyEquivalenceKey, Tr, Tc&, Targs...>(cpy)
 {}
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Assign<K, Tc, Tr, Targs...>::
-	Assign(Assign<K, Tc, Tr, Targs...>&& mov) :
-		simple::Handle<AssignKey, Tr, Tc&, Targs...>(mov)
+KeyEquivalence<K, Tc, Tr, Targs...>::
+	KeyEquivalence(KeyEquivalence<K, Tc, Tr, Targs...>&& mov) :
+		simple::Handle<KeyEquivalenceKey, Tr, Tc&, Targs...>(mov)
 {}
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Assign<K, Tc, Tr, Targs...>& Assign<K, Tc, Tr, Targs...>::
-	operator=(const Assign<K, Tc, Tr, Targs...>& cpy)
+KeyEquivalence<K, Tc, Tr, Targs...>& KeyEquivalence<K, Tc, Tr, Targs...>::
+	operator=(const KeyEquivalence<K, Tc, Tr, Targs...>& cpy)
 {
-	simple::Handle<AssignKey, Tr, Tc&, Targs...>::operator=(cpy);
+	simple::Handle<KeyEquivalenceKey, Tr, Tc&, Targs...>::operator=(cpy);
 	return *this;
 }
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Assign<K, Tc, Tr, Targs...>& Assign<K, Tc, Tr, Targs...>::
+KeyEquivalence<K, Tc, Tr, Targs...>& KeyEquivalence<K, Tc, Tr, Targs...>::
 	operator=(HandleType handle)
 {
-	simple::Handle<AssignKey, Tr, Tc&, Targs...>::operator=(handle);
+	simple::Handle<KeyEquivalenceKey, Tr, Tc&, Targs...>::operator=(handle);
 	return *this;
 }
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Tr Assign<K, Tc, Tr, Targs...>::operator()(Tc& cont, Targs... val_args)
+Tr KeyEquivalence<K, Tc, Tr, Targs...>::operator()(Tc& cont, Targs... val_args)
 {
-    return simple::Handle<AssignKey, Tr, Tc&, Targs...>
+    return simple::Handle<KeyEquivalenceKey, Tr, Tc&, Targs...>
 		::operator()(cont, val_args...);
 }
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Assign<K, Tc, Tr, Targs...>::operator bool() const
+KeyEquivalence<K, Tc, Tr, Targs...>::operator bool() const
 {
-	return simple::Handle<AssignKey, Tr, Tc&, Targs...>::operator bool();
+	return simple::Handle<KeyEquivalenceKey, Tr, Tc&, Targs...>::operator bool();
 }
 
 }
@@ -250,4 +252,4 @@ Assign<K, Tc, Tr, Targs...>::operator bool() const
 
 }
 
-#endif //!CONTAINER_HANDLE_ASSIGN_H_
+#endif //!CONTAINER_HANDLE_KEY_EQUIVALENCE_H_

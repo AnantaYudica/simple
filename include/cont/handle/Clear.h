@@ -1,5 +1,5 @@
-#ifndef CONTAINER_HANDLE_ASSIGN_H_
-#define CONTAINER_HANDLE_ASSIGN_H_
+#ifndef CONTAINER_HANDLE_CLEAR_H_
+#define CONTAINER_HANDLE_CLEAR_H_
 
 #include <type_traits>
 #include <functional>
@@ -11,41 +11,41 @@ namespace simple
 {
 namespace _helper
 {
-namespace _assign
+namespace _clear
 {
 template<typename Tc, typename... Targs>
 static constexpr auto _IsHasFunctionMember0(Tc c) ->
-	decltype(c.assign(std::declval<Targs>()...), std::true_type());
+	decltype(c.clear(std::declval<Targs>()...), std::true_type());
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionMember0(...);
 
 template<typename Tc, typename... Targs>
 static constexpr auto _IsHasFunctionMember1(Tc c) ->
-	decltype(c.Assign(std::declval<Targs>()...), std::true_type());
+	decltype(c.Clear(std::declval<Targs>()...), std::true_type());
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionMember1(...);
 
 template<typename Tc, typename... Targs>
 static constexpr auto _IsHasFunctionReference0(Tc c) ->
-	decltype(assign(c, std::declval<Targs>()...), std::true_type());
+	decltype(clear(c, std::declval<Targs>()...), std::true_type());
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionReference0(...);
 
 template<typename Tc, typename... Targs>
 static constexpr auto _IsHasFunctionReference1(Tc c) ->
-	decltype(Assign(c, std::declval<Targs>()...), std::true_type());
+	decltype(Clear(c, std::declval<Targs>()...), std::true_type());
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionReference1(...);
 
 template<typename Tc, typename... Targs>
 static constexpr auto _IsHasFunctionPointer0(Tc c) ->
-	decltype(assign(&c, std::declval<Targs>()...), std::true_type());
+	decltype(clear(&c, std::declval<Targs>()...), std::true_type());
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionPointer0(...);
 
 template<typename Tc, typename... Targs>
 static constexpr auto _IsHasFunctionPointer1(Tc c) ->
-	decltype(Assign(&c, std::declval<Targs>()...), std::true_type());
+	decltype(Clear(&c, std::declval<Targs>()...), std::true_type());
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionPointer1(...);
 
@@ -53,22 +53,22 @@ template<typename Tc, typename Tr, typename... Targs>
 struct _Validation
 {
 	static constexpr bool _HasFunctionMember0 =
-		decltype(simple::_helper::_assign::_IsHasFunctionMember0<Tc, Targs...>
+		decltype(simple::_helper::_clear::_IsHasFunctionMember0<Tc, Targs...>
 			(std::declval<Tc>()))::value;
 	static constexpr bool _HasFunctionMember1 =
-		decltype(simple::_helper::_assign::_IsHasFunctionMember1<Tc, Targs...>
+		decltype(simple::_helper::_clear::_IsHasFunctionMember1<Tc, Targs...>
 			(std::declval<Tc>()))::value;
 	static constexpr bool _HasFunctionReference0 =
-		decltype(simple::_helper::_assign::
-			_IsHasFunctionReference0<Tc, Targs...>(std::declval<Tc>()))::value;
+		decltype(simple::_helper::_clear::
+            _IsHasFunctionReference0<Tc, Targs...>(std::declval<Tc>()))::value;
 	static constexpr bool _HasFunctionReference1 =
-		decltype(simple::_helper::_assign::
-			_IsHasFunctionReference1<Tc, Targs...>(std::declval<Tc>()))::value;
+		decltype(simple::_helper::_clear::
+            _IsHasFunctionReference1<Tc, Targs...>(std::declval<Tc>()))::value;
 	static constexpr bool _HasFunctionPointer0 =
-		decltype(simple::_helper::_assign::_IsHasFunctionPointer0<Tc, Targs...>
+		decltype(simple::_helper::_clear::_IsHasFunctionPointer0<Tc, Targs...>
 			(std::declval<Tc>()))::value;
 	static constexpr bool _HasFunctionPointer1 =
-		decltype(simple::_helper::_assign::_IsHasFunctionPointer1<Tc, Targs...>
+		decltype(simple::_helper::_clear::_IsHasFunctionPointer1<Tc, Targs...>
 			(std::declval<Tc>()))::value;
 	static constexpr bool _HasFunction = (
 		_Validation<Tc, Tr, Targs...>::_HasFunctionMember0 ||
@@ -86,7 +86,7 @@ struct _Call
 		_Validation<Tc, Tr, Targs...>::_HasFunctionMember0, Tr>::type
 		DefaultHandle(Tc& c, Targs... args)
 	{
-		return c.assign(args...);
+		return c.clear(args...);
 	}
 
 	template<typename Tc, typename Tr, typename... Targs>
@@ -95,7 +95,7 @@ struct _Call
 		_Validation<Tc, Tr, Targs...>::_HasFunctionMember1, Tr>::type
 		DefaultHandle(Tc& c, Targs... args)
 	{
-		return c.Assign(args...);
+		return c.Clear(args...);
 	}
 
 	template<typename Tc, typename Tr, typename... Targs>
@@ -105,7 +105,7 @@ struct _Call
 		_Validation<Tc, Tr, Targs...>::_HasFunctionReference0, Tr>::type
 		DefaultHandle(Tc& c, Targs... args)
 	{
-		return assign(c, args...);
+		return clear(c, args...);
 	}
 
 	template<typename Tc, typename Tr, typename... Targs>
@@ -116,7 +116,7 @@ struct _Call
 		_Validation<Tc, Tr, Targs...>::_HasFunctionReference1, Tr>::type
 		DefaultHandle(Tc& c, Targs... args)
 	{
-		return Assign(c, args...);
+		return Clear(c, args...);
 	}
 
 	template<typename Tc, typename Tr, typename... Targs>
@@ -128,7 +128,7 @@ struct _Call
 		_Validation<Tc, Tr, Targs...>::_HasFunctionPointer0, Tr>::type
 		DefaultHandle(Tc& c, Targs... args)
 	{
-		return assign(&c, args...);
+		return clear(&c, args...);
 	}
 
 	template<typename Tc, typename Tr, typename... Targs>
@@ -141,7 +141,7 @@ struct _Call
 		_Validation<Tc, Tr, Targs...>::_HasFunctionPointer1, Tr>::type
 		DefaultHandle(Tc& c, Targs... args)
 	{
-		return Assign(&c, args...);
+		return Clear(&c, args...);
 	}
 
 	template<typename Tc, typename Tr, typename... Targs>
@@ -152,9 +152,9 @@ struct _Call
 		!_Validation<Tc, Tr, Targs...>::_HasFunctionReference1 &&
 		!_Validation<Tc, Tr, Targs...>::_HasFunctionPointer0 &&
 		!_Validation<Tc, Tr, Targs...>::_HasFunctionPointer1, Tr>::type
-		DefaultHandle(Tc& c, Targs... args)
+		DefaultHandle(...)
 	{
-		assert(!"do not have handle assign or Assign function ");
+		assert(!"do not have handle clear or Clear function ");
 	}
 };
 
@@ -167,81 +167,82 @@ namespace cont
 namespace handle
 {
 
-struct AssignKey;
+struct ClearKey;
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-class Assign : public simple::Handle<AssignKey, Tr, Tc&, Targs...>
+class Clear : public simple::Handle<ClearKey, Tr, Tc&, Targs...>
 {
 public:
 	typedef K KeyType;
 	typedef std::function<Tr(Tc&, Targs...)> HandleType;
 public:
-	Assign();
-	Assign(HandleType handle);
-	Assign(const Assign<K, Tc, Tr, Targs...>& cpy);
-	Assign(Assign<K, Tc, Tr, Targs...>&& mov);
+	Clear();
+	Clear(HandleType handle);
+	Clear(const Clear<K, Tc, Tr, Targs...>& cpy);
+	Clear(Clear<K, Tc, Tr, Targs...>&& mov);
 public:
-	Assign<K, Tc, Tr, Targs...>& 
-		operator=(const Assign<K, Tc, Tr, Targs...>& cpy);
-	Assign<K, Tc, Tr, Targs...>&
+	Clear<K, Tc, Tr, Targs...>& 
+		operator=(const Clear<K, Tc, Tr, Targs...>& cpy);
+	Clear<K, Tc, Tr, Targs...>&
 		operator=(HandleType handle);
 	Tr operator()(Tc& cont, Targs... val_args);
 	operator bool() const;
 };
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Assign<K, Tc, Tr, Targs...>::Assign()
+Clear<K, Tc, Tr, Targs...>::Clear()
 {
-	if (simple::_helper::_assign::_Validation<Tc, Tr, Targs...>::_HasFunction)
+	if (simple::_helper::_clear::
+		_Validation<Tc, Tr, Targs...>::_HasFunction)
 	{
-		Set(&simple::_helper::_assign::_Call::DefaultHandle<Tc, Tr, Targs...>);
+		Set(&simple::_helper::_clear::
+			_Call::DefaultHandle<Tc, Tr, Targs...>);
 	}
 }
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Assign<K, Tc, Tr, Targs...>::Assign(HandleType handle) :
-	simple::Handle<AssignKey, Tr, Tc&, Targs...>(handle)
-{}  
-
-template<typename K, typename Tc, typename Tr, typename... Targs>
-Assign<K, Tc, Tr, Targs...>::
-	Assign(const Assign<K, Tc, Tr, Targs...>& cpy) :
-		simple::Handle<AssignKey, Tr, Tc&, Targs...>(cpy)
+Clear<K, Tc, Tr, Targs...>::Clear(HandleType handle) :
+	simple::Handle<ClearKey, Tr, Tc&, Targs...>(handle)
 {}
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Assign<K, Tc, Tr, Targs...>::
-	Assign(Assign<K, Tc, Tr, Targs...>&& mov) :
-		simple::Handle<AssignKey, Tr, Tc&, Targs...>(mov)
+Clear<K, Tc, Tr, Targs...>::
+	Clear(const Clear<K, Tc, Tr, Targs...>& cpy) :
+		simple::Handle<ClearKey, Tr, Tc&, Targs...>(cpy)
 {}
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Assign<K, Tc, Tr, Targs...>& Assign<K, Tc, Tr, Targs...>::
-	operator=(const Assign<K, Tc, Tr, Targs...>& cpy)
+Clear<K, Tc, Tr, Targs...>::Clear(Clear<K, Tc, Tr, Targs...>&& mov) :
+	simple::Handle<ClearKey, Tr, Tc&, Targs...>(mov)
+{}
+
+template<typename K, typename Tc, typename Tr, typename... Targs>
+Clear<K, Tc, Tr, Targs...>& Clear<K, Tc, Tr, Targs...>::
+	operator=(const Clear<K, Tc, Tr, Targs...>& cpy)
 {
-	simple::Handle<AssignKey, Tr, Tc&, Targs...>::operator=(cpy);
+	simple::Handle<ClearKey, Tr, Tc&, Targs...>::operator=(cpy);
 	return *this;
 }
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Assign<K, Tc, Tr, Targs...>& Assign<K, Tc, Tr, Targs...>::
+Clear<K, Tc, Tr, Targs...>& Clear<K, Tc, Tr, Targs...>::
 	operator=(HandleType handle)
 {
-	simple::Handle<AssignKey, Tr, Tc&, Targs...>::operator=(handle);
+	simple::Handle<ClearKey, Tr, Tc&, Targs...>::operator=(handle);
 	return *this;
 }
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Tr Assign<K, Tc, Tr, Targs...>::operator()(Tc& cont, Targs... val_args)
+Tr Clear<K, Tc, Tr, Targs...>::operator()(Tc& cont, Targs... val_args)
 {
-    return simple::Handle<AssignKey, Tr, Tc&, Targs...>
-		::operator()(cont, val_args...);
+	return simple::Handle<ClearKey, Tr, Tc&, Targs...>::
+		operator()(cont, val_args...);
 }
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
-Assign<K, Tc, Tr, Targs...>::operator bool() const
+Clear<K, Tc, Tr, Targs...>::operator bool() const
 {
-	return simple::Handle<AssignKey, Tr, Tc&, Targs...>::operator bool();
+	return simple::Handle<ClearKey, Tr, Tc&, Targs...>::operator bool();
 }
 
 }
@@ -250,4 +251,4 @@ Assign<K, Tc, Tr, Targs...>::operator bool() const
 
 }
 
-#endif //!CONTAINER_HANDLE_ASSIGN_H_
+#endif //!CONTAINER_HANDLE_CLEAR_H_
