@@ -6,6 +6,7 @@
 #include <cassert>
 
 #include "../../Handle.h"
+#include "../../type/Switch.h"
 
 namespace simple
 {
@@ -49,114 +50,83 @@ static constexpr auto _IsHasFunctionPointer1(Tc c) ->
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionPointer1(...);
 
-template<typename Tc, typename Tr, typename... Targs>
-struct _Validation
+template<typename K, typename Tc, typename Tr, typename... Targs>
+using _SwitchDefaultHandleType = simple::type::Switch<K, std::false_type,
+	decltype(simple::_helper::_unique::
+		_IsHasFunctionMember0<Tc, Targs...>(std::declval<Tc>())),
+	decltype(simple::_helper::_unique::
+		_IsHasFunctionMember1<Tc, Targs...>(std::declval<Tc>())),
+	decltype(simple::_helper::_unique::
+		_IsHasFunctionReference0<Tc, Targs...>(std::declval<Tc>())),
+	decltype(simple::_helper::_unique::
+		_IsHasFunctionReference1<Tc, Targs...>(std::declval<Tc>())),
+	decltype(simple::_helper::_unique::
+		_IsHasFunctionPointer0<Tc, Targs...>(std::declval<Tc>())),
+	decltype(simple::_helper::_unique::
+		_IsHasFunctionPointer1<Tc, Targs...>(std::declval<Tc>()))>;
+
+template<typename K, typename Tc, typename Tr, typename... Targs>
+using _HasDefaultHandle = std::integral_constant<bool,
+	simple::_helper::_unique::
+		_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index !=
+	simple::_helper::_unique::
+		_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Size>;
+
+template<typename K, typename Tc, typename Tr, typename... Targs>
+typename std::enable_if<simple::_helper::_unique::
+	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 0, Tr>::type
+	_DefaultHandle(Tc& c, Targs... args)
 {
-	static constexpr bool _HasFunctionMember0 =
-		decltype(simple::_helper::_unique::_IsHasFunctionMember0<Tc, Targs...>
-			(std::declval<Tc>()))::value;
-	static constexpr bool _HasFunctionMember1 =
-		decltype(simple::_helper::_unique::_IsHasFunctionMember1<Tc, Targs...>
-			(std::declval<Tc>()))::value;
-	static constexpr bool _HasFunctionReference0 =
-		decltype(simple::_helper::_unique::
-			_IsHasFunctionReference0<Tc, Targs...>(std::declval<Tc>()))::value;
-	static constexpr bool _HasFunctionReference1 =
-		decltype(simple::_helper::_unique::
-			_IsHasFunctionReference1<Tc, Targs...>(std::declval<Tc>()))::value;
-	static constexpr bool _HasFunctionPointer0 =
-		decltype(simple::_helper::_unique::_IsHasFunctionPointer0<Tc, Targs...>
-			(std::declval<Tc>()))::value;
-	static constexpr bool _HasFunctionPointer1 =
-		decltype(simple::_helper::_unique::_IsHasFunctionPointer1<Tc, Targs...>
-			(std::declval<Tc>()))::value;
-	static constexpr bool _HasFunction = (
-		_Validation<Tc, Tr, Targs...>::_HasFunctionMember0 ||
-		_Validation<Tc, Tr, Targs...>::_HasFunctionMember1 ||
-		_Validation<Tc, Tr, Targs...>::_HasFunctionReference0 ||
-		_Validation<Tc, Tr, Targs...>::_HasFunctionReference1 || 
-		_Validation<Tc, Tr, Targs...>::_HasFunctionPointer0 ||
-		_Validation<Tc, Tr, Targs...>::_HasFunctionPointer1);
-};
+	return c.unique(args...);
+}
 
-struct _Call
+template<typename K, typename Tc, typename Tr, typename... Targs>
+typename std::enable_if<simple::_helper::_unique::
+	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 1, Tr>::type
+	_DefaultHandle(Tc& c, Targs... args)
 {
-	template<typename Tc, typename Tr, typename... Targs>
-	static typename std::enable_if<
-		_Validation<Tc, Tr, Targs...>::_HasFunctionMember0, Tr>::type
-		DefaultHandle(Tc& c, Targs... args)
-	{
-		return c.unique(args...);
-	}
+	return c.Unique(args...);
+}
 
-	template<typename Tc, typename Tr, typename... Targs>
-	static typename std::enable_if<
-		!_Validation<Tc, Tr, Targs...>::_HasFunctionMember0 &&
-		_Validation<Tc, Tr, Targs...>::_HasFunctionMember1, Tr>::type
-		DefaultHandle(Tc& c, Targs... args)
-	{
-		return c.Unique(args...);
-	}
+template<typename K, typename Tc, typename Tr, typename... Targs>
+typename std::enable_if<simple::_helper::_unique::
+	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 2, Tr>::type
+	_DefaultHandle(Tc& c, Targs... args)
+{
+	return unique(c, args...);
+}
 
-	template<typename Tc, typename Tr, typename... Targs>
-	static typename std::enable_if<
-		!_Validation<Tc, Tr, Targs...>::_HasFunctionMember0 &&
-		!_Validation<Tc, Tr, Targs...>::_HasFunctionMember1 &&
-		_Validation<Tc, Tr, Targs...>::_HasFunctionReference0, Tr>::type
-		DefaultHandle(Tc& c, Targs... args)
-	{
-		return unique(c, args...);
-	}
+template<typename K, typename Tc, typename Tr, typename... Targs>
+typename std::enable_if<simple::_helper::_unique::
+	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 3, Tr>::type
+	_DefaultHandle(Tc& c, Targs... args)
+{
+	return Unique(c, args...);
+}
 
-	template<typename Tc, typename Tr, typename... Targs>
-	static typename std::enable_if<
-		!_Validation<Tc, Tr, Targs...>::_HasFunctionMember0 &&
-		!_Validation<Tc, Tr, Targs...>::_HasFunctionMember1 &&
-		!_Validation<Tc, Tr, Targs...>::_HasFunctionReference0 &&
-		_Validation<Tc, Tr, Targs...>::_HasFunctionReference1, Tr>::type
-		DefaultHandle(Tc& c, Targs... args)
-	{
-		return Unique(c, args...);
-	}
+template<typename K, typename Tc, typename Tr, typename... Targs>
+typename std::enable_if<simple::_helper::_unique::
+	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 4, Tr>::type
+	_DefaultHandle(Tc& c, Targs... args)
+{
+	return unique(&c, args...);
+}
 
-	template<typename Tc, typename Tr, typename... Targs>
-	static typename std::enable_if<
-		!_Validation<Tc, Tr, Targs...>::_HasFunctionMember0 &&
-		!_Validation<Tc, Tr, Targs...>::_HasFunctionMember1 &&
-		!_Validation<Tc, Tr, Targs...>::_HasFunctionReference0 &&
-		!_Validation<Tc, Tr, Targs...>::_HasFunctionReference1 &&
-		_Validation<Tc, Tr, Targs...>::_HasFunctionPointer0, Tr>::type
-		DefaultHandle(Tc& c, Targs... args)
-	{
-		return unique(&c, args...);
-	}
+template<typename K, typename Tc, typename Tr, typename... Targs>
+typename std::enable_if<simple::_helper::_unique::
+	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 5, Tr>::type
+	_DefaultHandle(Tc& c, Targs... args)
+{
+	return Unique(&c, args...);
+}
 
-	template<typename Tc, typename Tr, typename... Targs>
-	static typename std::enable_if<
-		!_Validation<Tc, Tr, Targs...>::_HasFunctionMember0 &&
-		!_Validation<Tc, Tr, Targs...>::_HasFunctionMember1 &&
-		!_Validation<Tc, Tr, Targs...>::_HasFunctionReference0 &&
-		!_Validation<Tc, Tr, Targs...>::_HasFunctionReference1 &&
-		!_Validation<Tc, Tr, Targs...>::_HasFunctionPointer0 &&
-		_Validation<Tc, Tr, Targs...>::_HasFunctionPointer1, Tr>::type
-		DefaultHandle(Tc& c, Targs... args)
-	{
-		return Unique(&c, args...);
-	}
-
-	template<typename Tc, typename Tr, typename... Targs>
-	static typename std::enable_if<
-		!_Validation<Tc, Tr, Targs...>::_HasFunctionMember0 &&
-		!_Validation<Tc, Tr, Targs...>::_HasFunctionMember1 &&
-		!_Validation<Tc, Tr, Targs...>::_HasFunctionReference0 &&
-		!_Validation<Tc, Tr, Targs...>::_HasFunctionReference1 &&
-		!_Validation<Tc, Tr, Targs...>::_HasFunctionPointer0 &&
-		!_Validation<Tc, Tr, Targs...>::_HasFunctionPointer1, Tr>::type
-		DefaultHandle(Tc& c, Targs... args)
-	{
-		assert(!"do not have handle unique or Unique function ");
-	}
-};
+template<typename K, typename Tc, typename Tr, typename... Targs>
+typename std::enable_if<!_HasDefaultHandle<K, Tc, Tr, Targs...>::value,
+	 Tr>::type
+	_DefaultHandle(Tc& c, Targs... args)
+{
+	assert(!"do not have handle unique or Unique function ");
+}
 
 }
 
@@ -192,10 +162,9 @@ public:
 template<typename K, typename Tc, typename Tr, typename... Targs>
 Unique<K, Tc, Tr, Targs...>::Unique()
 {
-	if (simple::_helper::_unique::_Validation<Tc, Tr, Targs...>::_HasFunction)
-	{
-		Set(&simple::_helper::_unique::_Call::DefaultHandle<Tc, Tr, Targs...>);
-	}
+	if (simple::_helper::_unique::
+		_HasDefaultHandle<K, Tc, Tr, Targs...>::value)
+		Set(&simple::_helper::_unique::_DefaultHandle<K, Tc, Tr, Targs...>);
 }
 
 template<typename K, typename Tc, typename Tr, typename... Targs>
