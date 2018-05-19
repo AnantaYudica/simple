@@ -3,6 +3,8 @@
 
 #include <iterator>
 
+#include "../id_const/Validation.h"
+
 #include "../Iterator.h"
 #include "Input.h"
 #include "Output.h"
@@ -12,100 +14,120 @@ namespace simple
 namespace iter
 {
 
-template<typename K, typename T, typename D = std::ptrdiff_t, typename P = T*,
-    typename R = T&, typename C = std::forward_iterator_tag,
+struct ForwardIDConst : simple::iter::InputIDConst,
+    simple::iter::OutputIDConst {};
+
+template<typename Tidc, typename T, typename D = std::ptrdiff_t, 
+    typename P = T*, typename R = T&, typename C = std::forward_iterator_tag,
     typename IT = std::iterator<C, T, D, P, R>>
-class Forward: public Input<K, T, D, P, R, C, IT>, 
-    public Output<K, T, D, P, R, C, IT>,
-    public virtual Iterator<K, C, T, D, P, R, IT>
+class Forward: public simple::iter::Input<Tidc, T, D, P, R, C, IT>, 
+    public simple::iter::Output<Tidc, T, D, P, R, C, IT>,
+    public virtual simple::Iterator<Tidc, C, T, D, P, R, IT>
 {
+public:
+    typedef typename simple::id_const::
+        Validation<Tidc>::Type IDConstType;
+    typedef C CategoryType;
+    typedef T ValueType;
+    typedef D DistanceType;
+    typedef P PointerType;
+    typedef R ReferenceType;
+private:
+    typedef simple::iter::Input<Tidc, T, D, P, R, C, IT> BaseInputIteratorType;
+    typedef simple::iter::Output<Tidc, T, D,
+         P, R, C, IT> BaseOutputIteratorType;
+    typedef simple::Iterator<Tidc, C, T, D, P, R, IT> BaseIteratorType;
 public:
     Forward();
     Forward(P ptr);
-    Forward(const Forward<K, T, D, P, R, C, IT>& cpy);
-    Forward(Forward<K, T, D, P, R, C, IT>&& mov);
+    Forward(const Forward<Tidc, T, D, P, R, C, IT>& cpy);
+    Forward(Forward<Tidc, T, D, P, R, C, IT>&& mov);
 public:
-    Forward<K, T, D, P, R, C, IT>& 
-        operator=(const Forward<K, T, D, P, R, C, IT>& cpy);
-    Forward<K, T, D, P, R, C, IT>& operator=(P ptr);
+    Forward<Tidc, T, D, P, R, C, IT>& 
+        operator=(const Forward<Tidc, T, D, P, R, C, IT>& cpy);
+    Forward<Tidc, T, D, P, R, C, IT>& operator=(P ptr);
     R operator*();
     R operator->();
     const R operator*() const;
     const R operator->() const;
 };
 
-template<typename K, typename T, typename D, typename P,
+template<typename Tidc, typename T, typename D, typename P,
     typename R, typename C, typename IT>
-Forward<K, T, D, P, R, C, IT>::Forward() :
-    Iterator<K, C, T, D, P, R, IT>(nullptr)
+Forward<Tidc, T, D, P, R, C, IT>::Forward() :
+    BaseIteratorType(nullptr)
 {}
 
-template<typename K, typename T, typename D, typename P,
+template<typename Tidc, typename T, typename D, typename P,
     typename R, typename C, typename IT>
-Forward<K, T, D, P, R, C, IT>::Forward(P ptr) :
-    Iterator<K, C, T, D, P, R, IT>(ptr)
+Forward<Tidc, T, D, P, R, C, IT>::Forward(P ptr) :
+    BaseIteratorType(ptr),
+    BaseInputIteratorType(ptr),
+    BaseOutputIteratorType(ptr)
 {}
 
-template<typename K, typename T, typename D, typename P,
+template<typename Tidc, typename T, typename D, typename P,
     typename R, typename C, typename IT>
-Forward<K, T, D, P, R, C, IT>::
-    Forward(const Forward<K, T, D, P, R, C, IT>& cpy) :
-        Iterator<K, C, T, D, P, R, IT>(cpy),
-        Input<K, T, D, P, R, C, IT>(cpy),
-        Output<K, T, D, P, R, C, IT>(cpy)
+Forward<Tidc, T, D, P, R, C, IT>::
+    Forward(const Forward<Tidc, T, D, P, R, C, IT>& cpy) :
+        BaseIteratorType(cpy),
+        BaseInputIteratorType(cpy),
+        BaseOutputIteratorType(cpy)
 {}
 
-template<typename K, typename T, typename D, typename P,
+template<typename Tidc, typename T, typename D, typename P,
     typename R, typename C, typename IT>
-Forward<K, T, D, P, R, C, IT>::Forward(Forward<K, T, D, P, R, C, IT>&& mov) :
-    Iterator<K, C, T, D, P, R, IT>(mov),
-    Input<K, T, D, P, R, C, IT>(mov),
-    Output<K, T, D, P, R, C, IT>(mov)
+Forward<Tidc, T, D, P, R, C, IT>::
+    Forward(Forward<Tidc, T, D, P, R, C, IT>&& mov) :
+        BaseIteratorType(mov),
+        BaseInputIteratorType(mov),
+        BaseOutputIteratorType(mov)
 {}
 
-template<typename K, typename T, typename D, typename P,
+template<typename Tidc, typename T, typename D, typename P,
     typename R, typename C, typename IT>
-Forward<K, T, D, P, R, C, IT>& Forward<K, T, D, P, R, C, IT>::
-    operator=(const Forward<K, T, D, P, R, C, IT>& cpy)
+Forward<Tidc, T, D, P, R, C, IT>& Forward<Tidc, T, D, P, R, C, IT>::
+    operator=(const Forward<Tidc, T, D, P, R, C, IT>& cpy)
 {
-    Iterator<K, C, T, D, P, R, IT>::operator=(cpy);
-    Input<K, T, D, P, R, C, IT>::SetRValueHandle(cpy);
-    Output<K, T, D, P, R, C, IT>::SetLValueHandle(cpy);
+    BaseIteratorType::operator=(cpy);
+    BaseInputIteratorType::SetRValueHandle(cpy);
+    BaseOutputIteratorType::SetLValueHandle(cpy);
     return *this;
 }
 
-template<typename K, typename T, typename D, typename P,
+template<typename Tidc, typename T, typename D, typename P,
     typename R, typename C, typename IT>
-Forward<K, T, D, P, R, C, IT>& Forward<K, T, D, P, R, C, IT>::operator=(P ptr)
+Forward<Tidc, T, D, P, R, C, IT>& 
+    Forward<Tidc, T, D, P, R, C, IT>::operator=(P ptr)
 {
-    Iterator<K, C, T, D, P, R, IT>::operator=(ptr);
+    BaseIteratorType::operator=(ptr);
     return *this;
 }
 
-template<typename K, typename T, typename D, typename P,
+template<typename Tidc, typename T, typename D, typename P,
     typename R, typename C, typename IT>
-R Forward<K, T, D, P, R, C, IT>::operator*()
+R Forward<Tidc, T, D, P, R, C, IT>::operator*()
 {
-    return Output<K, T, D, P, R, C, IT>::operator*();
+    return BaseOutputIteratorType::operator*();
 }
 
-template<typename K, typename T, typename D, typename P,
+template<typename Tidc, typename T, typename D, typename P,
     typename R, typename C, typename IT>
-R Forward<K, T, D, P, R, C, IT>::operator->()
+R Forward<Tidc, T, D, P, R, C, IT>::operator->()
 {
     return *(*this);
 }
 
-template<typename K, typename T, typename D, typename P,
+template<typename Tidc, typename T, typename D, typename P,
     typename R, typename C, typename IT>
-const R Forward<K, T, D, P, R, C, IT>::operator*() const
+const R Forward<Tidc, T, D, P, R, C, IT>::operator*() const
 {
-    return Input<K, T, D, P, R, C, IT>::operator*();
+    return BaseInputIteratorType::operator*();
 }
 
-template<typename K, typename T, typename D, typename P,
+template<typename Tidc, typename T, typename D, typename P,
     typename R, typename C, typename IT>
-const R Forward<K, T, D, P, R, C, IT>::operator->() const
+const R Forward<Tidc, T, D, P, R, C, IT>::operator->() const
 {
     return *(*this);
 }

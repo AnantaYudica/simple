@@ -17,7 +17,7 @@ constexpr std::false_type _HasDeclation0(...);
 
 template<typename T>
 constexpr auto _HasDeclation1(T) ->
-    decltype(std::declval<typename T::IDConst>(), 
+    decltype(std::declval<typename T::IDConstType>(), 
         std::true_type());
 template<typename T>
 constexpr std::false_type _HasDeclation1(...);

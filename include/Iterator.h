@@ -4,137 +4,155 @@
 #include <iterator>
 #include <functional>
 
+#include "id_const/Validation.h"
+
+#include "Handle.h"
+
 namespace simple
 {
 
-template<typename K, typename C, typename T, typename D = std::ptrdiff_t,
-    typename P = T*, typename R = T&, typename IT = std::iterator<C, T, D, P, R>>
-class Iterator : public IT
+struct IteratorIDConst : simple::IdentifierConstant {};
+
+namespace iter
+{
+
+struct IncrementIDConst : simple::IteratorIDConst {};
+
+}
+
+template<typename Tidc, typename C, typename T, typename D = std::ptrdiff_t,
+    typename P = T*, typename R = T&, 
+    typename IT = std::iterator<C, T, D, P, R>>
+class Iterator : public IT, 
+    public Handle<simple::iter::IncrementIDConst, void, P*>
 {
 public:
-    typedef K KeyType; 
+    typedef typename simple::id_const::
+        Validation<Tidc>::type IDConstType; 
     typedef C CategoryType;
     typedef T ValueType;
     typedef D DistanceType;
     typedef P PointerType;
     typedef R ReferenceType;
-public:
-    typedef std::function<void(P*)> IncrementHandleType;
+    typedef typename Handle<simple::iter::IncrementIDConst, 
+        void, P*>::FunctionType IncrementHandleType;
+private:
+    typedef Handle<simple::iter::IncrementIDConst, 
+        void, P*> BaseIncrementHandleType;
 private:
     static void IncrementDefaultHandle(P* d_ptr);
 protected:
     P m_ptr;
-private:
-    IncrementHandleType m_increment_handle;
 protected:
     Iterator();
     Iterator(P ptr);
-    Iterator(const Iterator<K, C, T, D, P, R, IT>& cpy);
-    Iterator(Iterator<K, C, T, D, P, R, IT>&& mov);
+    Iterator(const Iterator<Tidc, C, T, D, P, R, IT>& cpy);
+    Iterator(Iterator<Tidc, C, T, D, P, R, IT>&& mov);
 public:
+    void Set(IncrementHandleType) = delete;
     void SetIncrementHandle(IncrementHandleType increment_handle);
-    void SetIncrementHandle(const Iterator<K, C, T, D, P, R, IT>& cpy);
+    void SetIncrementHandle(const Iterator<Tidc, C, T, D, P, R, IT>& cpy);
 public:
-    Iterator<K, C, T, D, P, R, IT>& 
-        operator=(const Iterator<K, C, T, D, P, R, IT>& cpy);
-    Iterator<K, C, T, D, P, R, IT>& operator=(P ptr);
-    Iterator<K, C, T, D, P, R, IT>& operator++();
-    Iterator<K, C, T, D, P, R, IT> operator++(int);
+    Iterator<Tidc, C, T, D, P, R, IT>& 
+        operator=(const Iterator<Tidc, C, T, D, P, R, IT>& cpy);
+    Iterator<Tidc, C, T, D, P, R, IT>& operator=(P ptr);
+    Iterator<Tidc, C, T, D, P, R, IT>& operator++();
+    Iterator<Tidc, C, T, D, P, R, IT> operator++(int);
 };
 
 
-template<typename K, typename C, typename T, typename D,
+template<typename Tidc, typename C, typename T, typename D,
     typename P, typename R, typename IT>
-void Iterator<K, C, T, D, P, R, IT>::IncrementDefaultHandle(P* d_ptr)
+void Iterator<Tidc, C, T, D, P, R, IT>::IncrementDefaultHandle(P* d_ptr)
 {
     if (d_ptr != nullptr)
         ++(*d_ptr);
 }
 
-template<typename K, typename C, typename T, typename D,
+template<typename Tidc, typename C, typename T, typename D,
     typename P, typename R, typename IT>
-Iterator<K, C, T, D, P, R, IT>::Iterator() :
-    m_ptr(nullptr),
-    m_increment_handle(IncrementDefaultHandle)
+Iterator<Tidc, C, T, D, P, R, IT>::Iterator() :
+    BaseIncrementHandleType(&IncrementDefaultHandle),
+    m_ptr(nullptr)
 {}
 
-template<typename K, typename C, typename T, typename D,
+template<typename Tidc, typename C, typename T, typename D,
     typename P, typename R, typename IT>
-Iterator<K, C, T, D, P, R, IT>::Iterator(P ptr) :
-    m_ptr(ptr),
-    m_increment_handle(IncrementDefaultHandle)
+Iterator<Tidc, C, T, D, P, R, IT>::Iterator(P ptr) :
+    BaseIncrementHandleType(IncrementDefaultHandle),
+    m_ptr(ptr)
 {}
 
-template<typename K, typename C, typename T, typename D,
+template<typename Tidc, typename C, typename T, typename D,
     typename P, typename R, typename IT>
-Iterator<K, C, T, D, P, R, IT>::
-    Iterator(const Iterator<K, C, T, D, P, R, IT>& cpy) :
-        m_ptr(cpy.m_ptr),
-        m_increment_handle(cpy.m_increment_handle)
+Iterator<Tidc, C, T, D, P, R, IT>::
+    Iterator(const Iterator<Tidc, C, T, D, P, R, IT>& cpy) :
+        BaseIncrementHandleType(cpy),
+        m_ptr(cpy.m_ptr)
 {}
 
-template<typename K, typename C, typename T, typename D,
+template<typename Tidc, typename C, typename T, typename D,
     typename P, typename R, typename IT>
-Iterator<K, C, T, D, P, R, IT>::
-    Iterator(Iterator<K, C, T, D, P, R, IT>&& mov) :
-        m_ptr(mov.m_ptr),
-        m_increment_handle(mov.m_increment_handle)
+Iterator<Tidc, C, T, D, P, R, IT>::
+    Iterator(Iterator<Tidc, C, T, D, P, R, IT>&& mov) :
+        BaseIncrementHandleType(mov),
+        m_ptr(mov.m_ptr)
 {}
 
-template<typename K, typename C, typename T, typename D,
+template<typename Tidc, typename C, typename T, typename D,
     typename P, typename R, typename IT>
-void Iterator<K, C, T, D, P, R, IT>::
+void Iterator<Tidc, C, T, D, P, R, IT>::
     SetIncrementHandle(IncrementHandleType increment_handle)
 {
-    m_increment_handle = increment_handle;
+    BaseIncrementHandleType::operator=(increment_handle);
 }
 
-template<typename K, typename C, typename T, typename D,
+template<typename Tidc, typename C, typename T, typename D,
     typename P, typename R, typename IT>
-void Iterator<K, C, T, D, P, R, IT>::
-    SetIncrementHandle(const Iterator<K, C, T, D, P, R, IT>& cpy)
+void Iterator<Tidc, C, T, D, P, R, IT>::
+    SetIncrementHandle(const Iterator<Tidc, C, T, D, P, R, IT>& cpy)
 {
-    SetIncrementHandle(cpy.m_increment_handle);
+    BaseIncrementHandleType::operator=(cpy);
 }
 
-template<typename K, typename C, typename T, typename D,
+template<typename Tidc, typename C, typename T, typename D,
     typename P, typename R, typename IT>
-Iterator<K, C, T, D, P, R, IT>& 
-    Iterator<K, C, T, D, P, R, IT>::
-        operator=(const Iterator<K, C, T, D, P, R, IT>& cpy)
+Iterator<Tidc, C, T, D, P, R, IT>& 
+    Iterator<Tidc, C, T, D, P, R, IT>::
+        operator=(const Iterator<Tidc, C, T, D, P, R, IT>& cpy)
 {
+    BaseIncrementHandleType::operator=(cpy);
     m_ptr = cpy.m_ptr;
-    m_increment_handle = cpy.m_increment_handle;
     return *this;
 }
 
-template<typename K, typename C, typename T, typename D,
+template<typename Tidc, typename C, typename T, typename D,
 typename P, typename R, typename IT>
-Iterator<K, C, T, D, P, R, IT>& 
-    Iterator<K, C, T, D, P, R, IT>::operator=(P ptr)
+Iterator<Tidc, C, T, D, P, R, IT>& 
+    Iterator<Tidc, C, T, D, P, R, IT>::operator=(P ptr)
 {
     m_ptr = ptr;
     return *this;
 }
 
-template<typename K, typename C, typename T, typename D,
+template<typename Tidc, typename C, typename T, typename D,
     typename P, typename R, typename IT>
-Iterator<K, C, T, D, P, R, IT>& 
-    Iterator<K, C, T, D, P, R, IT>::operator++()
+Iterator<Tidc, C, T, D, P, R, IT>& 
+    Iterator<Tidc, C, T, D, P, R, IT>::operator++()
 {
-    if (m_increment_handle)
-        m_increment_handle(&m_ptr);
+    if (static_cast<BaseIncrementHandleType&>(*this))
+        BaseIncrementHandleType::operator()(&m_ptr);
     else
         IncrementDefaultHandle(&m_ptr);
     return *this;  
 }
 
-template<typename K, typename C, typename T, typename D,
+template<typename Tidc, typename C, typename T, typename D,
     typename P, typename R, typename IT>
-Iterator<K, C, T, D, P, R, IT> 
-    Iterator<K, C, T, D, P, R, IT>::operator++(int)
+Iterator<Tidc, C, T, D, P, R, IT> 
+    Iterator<Tidc, C, T, D, P, R, IT>::operator++(int)
 {
-    Iterator<K, C, T, D, P, R, IT> cpy(*this);
+    Iterator<Tidc, C, T, D, P, R, IT> cpy(*this);
     ++(*this);
     return cpy;
 }

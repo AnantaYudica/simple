@@ -4,6 +4,10 @@
 #include <iterator>
 #include <functional>
 
+#include "../id_const/Validation.h"
+
+#include "../Handle.h"
+
 #include "../Iterator.h"
 #include "Forward.h"
 
@@ -12,125 +16,145 @@ namespace simple
 namespace iter
 {
 
-template<typename K, typename T, typename D = std::ptrdiff_t, typename P = T*,
-    typename R = T&, typename C = std::bidirectional_iterator_tag,
+struct BidirectionalIDConst : simple::iter::ForwardIDConst {};
+
+struct DecrementHandleIDConst : simple::iter::BidirectionalIDConst {};
+
+template<typename Tidc, typename T, typename D = std::ptrdiff_t, 
+    typename P = T*, typename R = T&, 
+    typename C = std::bidirectional_iterator_tag,
     typename IT = std::iterator<C, T, D, P, R>>
-class Bidirectional : public Forward<K, T, D, P, R, C, IT>,
-    public virtual Iterator<K, C, T, D, P, R, IT>
+class Bidirectional : public simple::iter::Forward<Tidc, T, D, P, R, C, IT>,
+    public simple::Handle<simple::iter::DecrementHandleIDConst, void, P*>,
+    public virtual simple::Iterator<Tidc, C, T, D, P, R, IT>
 {
 public:
-    typedef std::function<void(P*)> DecrementHandleType;
+    typedef typename simple::id_const::
+        Validation<Tidc>::Type IDConstType;
+    typedef C CategoryType;
+    typedef T ValueType;
+    typedef D DistanceType;
+    typedef P PointerType;
+    typedef R ReferenceType;
+    typedef typename simple::Handle<simple::iter::
+        DecrementHandleIDConst, void, P*>::FunctionType DecrementHandleType;
 private:
-    static void DecrementDefaultHandle(P* m_dptr);
+    typedef simple::iter::Forward<Tidc, T, D, P, R, C, IT> BaseForwardType;
+    typedef simple::Handle<simple::iter::
+        DecrementHandleIDConst, void, P*> BaseDecrementHandleType;
+    typedef simple::Iterator<Tidc, C, T, D, P, R, IT> BaseIteratorType;
 private:
-    DecrementHandleType m_decrement_handle;
+    void DecrementDefaultHandle(P* m_dptr);
 public:
     Bidirectional();
     Bidirectional(P ptr);
-    Bidirectional(const Bidirectional<K, T, D, P, R, C, IT>& cpy);
-    Bidirectional(Bidirectional<K, T, D, P, R, C, IT>&& mov);
+    Bidirectional(const Bidirectional<Tidc, T, D, P, R, C, IT>& cpy);
+    Bidirectional(Bidirectional<Tidc, T, D, P, R, C, IT>&& mov);
 public:
+    void Set(DecrementHandleType) = delete;
     void SetDecrementHandle(DecrementHandleType decrement_handle);
-    void SetDecrementHandle(const Bidirectional<K, T, D, P, R, C, IT>& cpy);
+    void SetDecrementHandle(const Bidirectional<Tidc, T, D, P, R, C, IT>& cpy);
 public:
-    Bidirectional<K, T, D, P, R, C, IT>& 
-        operator=(const Bidirectional<K, T, D, P, R, C, IT>& cpy);
-    Bidirectional<K, T, D, P, R, C, IT>& operator=(P ptr);
-    Bidirectional<K, T, D, P, R, C, IT>& operator--();
-    Bidirectional<K, T, D, P, R, C, IT> operator--(int);
+    Bidirectional<Tidc, T, D, P, R, C, IT>& 
+        operator=(const Bidirectional<Tidc, T, D, P, R, C, IT>& cpy);
+    Bidirectional<Tidc, T, D, P, R, C, IT>& operator=(P ptr);
+    Bidirectional<Tidc, T, D, P, R, C, IT>& operator--();
+    Bidirectional<Tidc, T, D, P, R, C, IT> operator--(int);
 };
 
-template<typename K, typename T, typename D, typename P,
+template<typename Tidc, typename T, typename D, typename P,
     typename R, typename C, typename IT>
-void Bidirectional<K, T, D, P, R, C, IT>::DecrementDefaultHandle(P* m_dptr)
+void Bidirectional<Tidc, T, D, P, R, C, IT>::DecrementDefaultHandle(P* m_dptr)
 {
     if (m_dptr != nullptr)
         --(*m_dptr);
 }
 
-template<typename K, typename T, typename D, typename P,
+template<typename Tidc, typename T, typename D, typename P,
     typename R, typename C, typename IT>
-Bidirectional<K, T, D, P, R, C, IT>::Bidirectional() :
-    Iterator<K, C, T, D, P, R, IT>(nullptr),
-    m_decrement_handle(DecrementDefaultHandle)
+Bidirectional<Tidc, T, D, P, R, C, IT>::Bidirectional() :
+    BaseIteratorType(nullptr),
+    BaseDecrementHandleType(DecrementDefaultHandle)
 {}
 
-template<typename K, typename T, typename D, typename P,
+template<typename Tidc, typename T, typename D, typename P,
     typename R, typename C, typename IT>
-Bidirectional<K, T, D, P, R, C, IT>::Bidirectional(P ptr) :
-    Iterator<K, C, T, D, P, R, IT>(ptr),
-    m_decrement_handle(DecrementDefaultHandle)
+Bidirectional<Tidc, T, D, P, R, C, IT>::Bidirectional(P ptr) :
+    BaseIteratorType(ptr),
+    BaseForwardType(ptr),
+    BaseDecrementHandleType(DecrementDefaultHandle)
 {}
 
-template<typename K, typename T, typename D, typename P,
+template<typename Tidc, typename T, typename D, typename P,
     typename R, typename C, typename IT>
-Bidirectional<K, T, D, P, R, C, IT>::
-    Bidirectional(const Bidirectional<K, T, D, P, R, C, IT>& cpy) :
-        Iterator<K, C, T, D, P, R, IT>(cpy),
-        Forward<K, T, D, P, R, C, IT>(cpy),
-        m_decrement_handle(cpy.m_decrement_handle)
+Bidirectional<Tidc, T, D, P, R, C, IT>::
+    Bidirectional(const Bidirectional<Tidc, T, D, P, R, C, IT>& cpy) :
+        BaseIteratorType(cpy),
+        BaseForwardType(cpy),
+        BaseDecrementHandleType(cpy)
 {}
 
-template<typename K, typename T, typename D, typename P,
+template<typename Tidc, typename T, typename D, typename P,
     typename R, typename C, typename IT>
-Bidirectional<K, T, D, P, R, C, IT>::
-    Bidirectional(Bidirectional<K, T, D, P, R, C, IT>&& mov) :
-        Iterator<K, C, T, D, P, R, IT>(mov),
-        Forward<K, T, D, P, R, C, IT>(mov),
-        m_decrement_handle(mov.m_decrement_handle)
+Bidirectional<Tidc, T, D, P, R, C, IT>::
+    Bidirectional(Bidirectional<Tidc, T, D, P, R, C, IT>&& mov) :
+        BaseIteratorType(mov),
+        BaseForwardType(mov),
+        BaseDecrementHandleType(mov)
 {}
 
-template<typename K, typename T, typename D, typename P,
+template<typename Tidc, typename T, typename D, typename P,
     typename R, typename C, typename IT>
-void Bidirectional<K, T, D, P, R, C, IT>::
+void Bidirectional<Tidc, T, D, P, R, C, IT>::
     SetDecrementHandle(DecrementHandleType decrement_handle)
 {
-    m_decrement_handle = decrement_handle;
+    BaseDecrementHandleType::operator=(decrement_handle);
 }
 
-template<typename K, typename T, typename D, typename P,
+template<typename Tidc, typename T, typename D, typename P,
     typename R, typename C, typename IT>
-void Bidirectional<K, T, D, P, R, C, IT>::
-    SetDecrementHandle(const Bidirectional<K, T, D, P, R, C, IT>& cpy)
+void Bidirectional<Tidc, T, D, P, R, C, IT>::
+    SetDecrementHandle(const Bidirectional<Tidc, T, D, P, R, C, IT>& cpy)
 {
-    SetDecrementHandle(cpy.m_decrement_handle);
+    BaseDecrementHandleType::operator=(cpy);
 }
 
-template<typename K, typename T, typename D, typename P,
+template<typename Tidc, typename T, typename D, typename P,
     typename R, typename C, typename IT>
-Bidirectional<K, T, D, P, R, C, IT>& Bidirectional<K, T, D, P, R, C, IT>::
-    operator=(const Bidirectional<K, T, D, P, R, C, IT>& cpy)
+Bidirectional<Tidc, T, D, P, R, C, IT>& 
+    Bidirectional<Tidc, T, D, P, R, C, IT>::
+        operator=(const Bidirectional<Tidc, T, D, P, R, C, IT>& cpy)
 {
-    Forward<K, T, D, P, R, C, IT>::operator=(cpy);
+    BaseForwardType::operator=(cpy);
     SetDecrementHandle(cpy);
     return *this;
 }
     
-template<typename K, typename T, typename D, typename P,
+template<typename Tidc, typename T, typename D, typename P,
     typename R, typename C, typename IT>
-Bidirectional<K, T, D, P, R, C, IT>& Bidirectional<K, T, D, P, R, C, IT>::
-    operator=(P ptr)
+Bidirectional<Tidc, T, D, P, R, C, IT>& 
+    Bidirectional<Tidc, T, D, P, R, C, IT>::operator=(P ptr)
 {
-    Iterator<K, C, T, D, P, R, IT>::operator=(ptr);
+    BaseIteratorType::operator=(ptr);
     return *this;
 }
 
-template<typename K, typename T, typename D, typename P,
+template<typename Tidc, typename T, typename D, typename P,
     typename R, typename C, typename IT>
-Bidirectional<K, T, D, P, R, C, IT>& 
-    Bidirectional<K, T, D, P, R, C, IT>::operator--()
+Bidirectional<Tidc, T, D, P, R, C, IT>& 
+    Bidirectional<Tidc, T, D, P, R, C, IT>::operator--()
 {
-    if (m_increment_handle != nullptr)
-        m_decrement_handle(&m_ptr);
+    if (static_cast<BaseDecrementHandleType&>(*this))
+        BaseDecrementHandleType::operator()(&m_ptr);
     else
         DecrementDefaultHandle(&m_ptr);
     return *this;
 }
 
-template<typename K, typename T, typename D, typename P,
+template<typename Tidc, typename T, typename D, typename P,
     typename R, typename C, typename IT>
-Bidirectional<K, T, D, P, R, C, IT> 
-    Bidirectional<K, T, D, P, R, C, IT>::operator--(int)
+Bidirectional<Tidc, T, D, P, R, C, IT> 
+    Bidirectional<Tidc, T, D, P, R, C, IT>::operator--(int)
 {
     return --(*this);
 }
