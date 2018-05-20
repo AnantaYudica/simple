@@ -5,6 +5,8 @@
 #include <functional>
 #include <cassert>
 
+#include "../../IdentifierConstant.h"
+#include "../../id_const/Validation.h"
 #include "../../Handle.h"
 #include "../../type/Switch.h"
 
@@ -50,8 +52,8 @@ static constexpr auto _IsHasFunctionPointer1(Tc c) ->
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionPointer1(...);
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-using _SwitchDefaultHandleType = simple::type::Switch<K, std::false_type,
+template<typename Tc, typename Tr, typename... Targs>
+using _SwitchDefaultHandleType = simple::type::Switch<std::false_type,
 	decltype(simple::_helper::_push_front::
 		_IsHasFunctionMember0<Tc, Targs...>(std::declval<Tc>())),
 	decltype(simple::_helper::_push_front::
@@ -65,63 +67,63 @@ using _SwitchDefaultHandleType = simple::type::Switch<K, std::false_type,
 	decltype(simple::_helper::_push_front::
 		_IsHasFunctionPointer1<Tc, Targs...>(std::declval<Tc>()))>;
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 using _HasDefaultHandle = std::integral_constant<bool,
 	simple::_helper::_push_front::
-		_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index !=
+		_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index !=
 	simple::_helper::_push_front::
-		_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Size>;
+		_SwitchDefaultHandleType<Tc, Tr, Targs...>::Size>;
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_push_front::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 0, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 0, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return c.push_front(args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_push_front::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 1, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 1, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return c.PushFront(args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_push_front::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 2, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 2, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return push_front(c, args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_push_front::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 3, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 3, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return PushFront(c, args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_push_front::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 4, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 4, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return push_front(&c, args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_push_front::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 5, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 5, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return PushFront(&c, args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<!_HasDefaultHandle<K, Tc, Tr, Targs...>::value,
+template<typename Tc, typename Tr, typename... Targs>
+typename std::enable_if<!_HasDefaultHandle<Tc, Tr, Targs...>::value,
 	 Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
@@ -137,81 +139,85 @@ namespace cont
 namespace handle
 {
 
-struct PushFrontKey;
+struct PushFrontIDConst : simple::IdentifierConstant {};
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-class PushFront : public simple::Handle<PushFrontKey, Tr, Tc&, Targs...>
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+class PushFront : public simple::Handle<simple::cont::handle::PushFrontIDConst,
+	Tr, Tc&, Targs...>
 {
 public:
-	typedef K KeyType;
-	typedef std::function<Tr(Tc&, Targs...)> HandleType;
+	typedef typename simple::id_const::Validation<Tidc>::Type IDConstType;
+	typedef typename simple::Handle<simple::cont::handle::PushFrontIDConst,
+		Tr, Tc&, Targs...>::FunctionType HandleType;
+private:
+	typedef simple::Handle<simple::cont::handle::PushFrontIDConst,
+		Tr, Tc&, Targs...> BaseHandleType;
 public:
 	PushFront();
 	PushFront(HandleType handle);
-	PushFront(const PushFront<K, Tc, Tr, Targs...>& cpy);
-	PushFront(PushFront<K, Tc, Tr, Targs...>&& mov);
+	PushFront(const PushFront<Tidc, Tc, Tr, Targs...>& cpy);
+	PushFront(PushFront<Tidc, Tc, Tr, Targs...>&& mov);
 public:
-	PushFront<K, Tc, Tr, Targs...>& 
-		operator=(const PushFront<K, Tc, Tr, Targs...>& cpy);
-	PushFront<K, Tc, Tr, Targs...>&
+	PushFront<Tidc, Tc, Tr, Targs...>& 
+		operator=(const PushFront<Tidc, Tc, Tr, Targs...>& cpy);
+	PushFront<Tidc, Tc, Tr, Targs...>&
 		operator=(HandleType handle);
 	Tr operator()(Tc& cont, Targs... val_args);
 	operator bool() const;
 };
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-PushFront<K, Tc, Tr, Targs...>::PushFront()
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+PushFront<Tidc, Tc, Tr, Targs...>::PushFront()
 {
 	if (simple::_helper::_push_front::
-        _HasDefaultHandle<K, Tc, Tr, Targs...>::value)
+        _HasDefaultHandle<Tc, Tr, Targs...>::value)
 		Set(&simple::_helper::_push_front::
-            _DefaultHandle<K, Tc, Tr, Targs...>);
+            _DefaultHandle<Tc, Tr, Targs...>);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-PushFront<K, Tc, Tr, Targs...>::PushFront(HandleType handle) :
-	simple::Handle<PushFrontKey, Tr, Tc&, Targs...>(handle)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+PushFront<Tidc, Tc, Tr, Targs...>::PushFront(HandleType handle) :
+	BaseHandleType(handle)
 {}  
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-PushFront<K, Tc, Tr, Targs...>::
-	PushFront(const PushFront<K, Tc, Tr, Targs...>& cpy) :
-		simple::Handle<PushFrontKey, Tr, Tc&, Targs...>(cpy)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+PushFront<Tidc, Tc, Tr, Targs...>::
+	PushFront(const PushFront<Tidc, Tc, Tr, Targs...>& cpy) :
+		BaseHandleType(cpy)
 {}
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-PushFront<K, Tc, Tr, Targs...>::
-	PushFront(PushFront<K, Tc, Tr, Targs...>&& mov) :
-		simple::Handle<PushFrontKey, Tr, Tc&, Targs...>(mov)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+PushFront<Tidc, Tc, Tr, Targs...>::
+	PushFront(PushFront<Tidc, Tc, Tr, Targs...>&& mov) :
+		BaseHandleType(mov)
 {}
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-PushFront<K, Tc, Tr, Targs...>& PushFront<K, Tc, Tr, Targs...>::
-	operator=(const PushFront<K, Tc, Tr, Targs...>& cpy)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+PushFront<Tidc, Tc, Tr, Targs...>& PushFront<Tidc, Tc, Tr, Targs...>::
+	operator=(const PushFront<Tidc, Tc, Tr, Targs...>& cpy)
 {
-	simple::Handle<PushFrontKey, Tr, Tc&, Targs...>::operator=(cpy);
+	BaseHandleType::operator=(cpy);
 	return *this;
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-PushFront<K, Tc, Tr, Targs...>& PushFront<K, Tc, Tr, Targs...>::
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+PushFront<Tidc, Tc, Tr, Targs...>& PushFront<Tidc, Tc, Tr, Targs...>::
 	operator=(HandleType handle)
 {
-	simple::Handle<PushFrontKey, Tr, Tc&, Targs...>::operator=(handle);
+	BaseHandleType::operator=(handle);
 	return *this;
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-Tr PushFront<K, Tc, Tr, Targs...>::operator()(Tc& cont, Targs... val_args)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+Tr PushFront<Tidc, Tc, Tr, Targs...>::operator()(Tc& cont, Targs... val_args)
 {
-    return simple::Handle<PushFrontKey, Tr, Tc&, Targs...>
-		::operator()(cont, val_args...);
+    return BaseHandleType::operator()(cont, val_args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-PushFront<K, Tc, Tr, Targs...>::operator bool() const
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+PushFront<Tidc, Tc, Tr, Targs...>::operator bool() const
 {
-	return simple::Handle<PushFrontKey, Tr, Tc&, Targs...>::operator bool();
+	return BaseHandleType::operator bool();
 }
 
 }

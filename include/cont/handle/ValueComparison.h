@@ -5,6 +5,8 @@
 #include <functional>
 #include <cassert>
 
+#include "../../IdentifierConstant.h"
+#include "../../id_const/Validation.h"
 #include "../../Handle.h"
 #include "../../type/Switch.h"
 
@@ -50,8 +52,8 @@ static constexpr auto _IsHasFunctionPointer1(Tc c) ->
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionPointer1(...);
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-using _SwitchDefaultHandleType = simple::type::Switch<K, std::false_type,
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+using _SwitchDefaultHandleType = simple::type::Switch<Tidc, std::false_type,
 	decltype(simple::_helper::_value_comparison::
 		_IsHasFunctionMember0<Tc, Targs...>(std::declval<Tc>())),
 	decltype(simple::_helper::_value_comparison::
@@ -65,63 +67,63 @@ using _SwitchDefaultHandleType = simple::type::Switch<K, std::false_type,
 	decltype(simple::_helper::_value_comparison::
 		_IsHasFunctionPointer1<Tc, Targs...>(std::declval<Tc>()))>;
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 using _HasDefaultHandle = std::integral_constant<bool,
 	simple::_helper::_value_comparison::
-		_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index !=
+		_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index !=
 	simple::_helper::_value_comparison::
-		_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Size>;
+		_SwitchDefaultHandleType<Tc, Tr, Targs...>::Size>;
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_value_comparison::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 0, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 0, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return c.value_comp(args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_value_comparison::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 1, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 1, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return c.ValueComparison(args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_value_comparison::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 2, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 2, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return value_comp(c, args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_value_comparison::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 3, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 3, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return ValueComparison(c, args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_value_comparison::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 4, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 4, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return value_comp(&c, args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_value_comparison::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 5, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 5, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return ValueComparison(&c, args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<!_HasDefaultHandle<K, Tc, Tr, Targs...>::value,
+template<typename Tc, typename Tr, typename... Targs>
+typename std::enable_if<!_HasDefaultHandle<Tc, Tr, Targs...>::value,
 	 Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
@@ -137,81 +139,85 @@ namespace cont
 namespace handle
 {
 
-struct ValueComparisonKey;
+struct ValueComparisonIDConst : simple::IdentifierConstant {};
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-class ValueComparison : public simple::Handle<ValueComparisonKey, Tr, Tc&, Targs...>
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+class ValueComparison : public simple::Handle<simple::cont::handle::
+	ValueComparisonIDConst, Tr, Tc&, Targs...>
 {
 public:
-	typedef K KeyType;
-	typedef std::function<Tr(Tc&, Targs...)> HandleType;
+	typedef typename simple::id_const::Validation<Tidc>::Type IDConstType;
+	typedef typename simple::Handle<simple::cont::handle::
+		ValueComparisonIDConst, Tr, Tc&, Targs...>::FunctionType HandleType;
+private:
+	typedef simple::Handle<simple::cont::handle::
+		ValueComparisonIDConst, Tr, Tc&, Targs...> BaseHandleType;
 public:
 	ValueComparison();
 	ValueComparison(HandleType handle);
-	ValueComparison(const ValueComparison<K, Tc, Tr, Targs...>& cpy);
-	ValueComparison(ValueComparison<K, Tc, Tr, Targs...>&& mov);
+	ValueComparison(const ValueComparison<Tidc, Tc, Tr, Targs...>& cpy);
+	ValueComparison(ValueComparison<Tidc, Tc, Tr, Targs...>&& mov);
 public:
-	ValueComparison<K, Tc, Tr, Targs...>& 
-		operator=(const ValueComparison<K, Tc, Tr, Targs...>& cpy);
-	ValueComparison<K, Tc, Tr, Targs...>&
+	ValueComparison<Tidc, Tc, Tr, Targs...>& 
+		operator=(const ValueComparison<Tidc, Tc, Tr, Targs...>& cpy);
+	ValueComparison<Tidc, Tc, Tr, Targs...>&
 		operator=(HandleType handle);
 	Tr operator()(Tc& cont, Targs... val_args);
 	operator bool() const;
 };
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-ValueComparison<K, Tc, Tr, Targs...>::ValueComparison()
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+ValueComparison<Tidc, Tc, Tr, Targs...>::ValueComparison()
 {
 	if (simple::_helper::_value_comparison::
-        _HasDefaultHandle<K, Tc, Tr, Targs...>::value)
+        _HasDefaultHandle<Tc, Tr, Targs...>::value)
 		Set(&simple::_helper::_value_comparison::
-            _DefaultHandle<K, Tc, Tr, Targs...>);
+            _DefaultHandle<Tc, Tr, Targs...>);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-ValueComparison<K, Tc, Tr, Targs...>::ValueComparison(HandleType handle) :
-	simple::Handle<ValueComparisonKey, Tr, Tc&, Targs...>(handle)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+ValueComparison<Tidc, Tc, Tr, Targs...>::ValueComparison(HandleType handle) :
+	BaseHandleType(handle)
 {}  
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-ValueComparison<K, Tc, Tr, Targs...>::
-	ValueComparison(const ValueComparison<K, Tc, Tr, Targs...>& cpy) :
-		simple::Handle<ValueComparisonKey, Tr, Tc&, Targs...>(cpy)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+ValueComparison<Tidc, Tc, Tr, Targs...>::
+	ValueComparison(const ValueComparison<Tidc, Tc, Tr, Targs...>& cpy) :
+		BaseHandleType(cpy)
 {}
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-ValueComparison<K, Tc, Tr, Targs...>::
-	ValueComparison(ValueComparison<K, Tc, Tr, Targs...>&& mov) :
-		simple::Handle<ValueComparisonKey, Tr, Tc&, Targs...>(mov)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+ValueComparison<Tidc, Tc, Tr, Targs...>::
+	ValueComparison(ValueComparison<Tidc, Tc, Tr, Targs...>&& mov) :
+		BaseHandleType(mov)
 {}
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-ValueComparison<K, Tc, Tr, Targs...>& ValueComparison<K, Tc, Tr, Targs...>::
-	operator=(const ValueComparison<K, Tc, Tr, Targs...>& cpy)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+ValueComparison<Tidc, Tc, Tr, Targs...>& ValueComparison<Tidc, Tc, Tr, Targs...>::
+	operator=(const ValueComparison<Tidc, Tc, Tr, Targs...>& cpy)
 {
-	simple::Handle<ValueComparisonKey, Tr, Tc&, Targs...>::operator=(cpy);
+	BaseHandleType::operator=(cpy);
 	return *this;
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-ValueComparison<K, Tc, Tr, Targs...>& ValueComparison<K, Tc, Tr, Targs...>::
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+ValueComparison<Tidc, Tc, Tr, Targs...>& ValueComparison<Tidc, Tc, Tr, Targs...>::
 	operator=(HandleType handle)
 {
-	simple::Handle<ValueComparisonKey, Tr, Tc&, Targs...>::operator=(handle);
+	BaseHandleType::operator=(handle);
 	return *this;
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-Tr ValueComparison<K, Tc, Tr, Targs...>::operator()(Tc& cont, Targs... val_args)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+Tr ValueComparison<Tidc, Tc, Tr, Targs...>::operator()(Tc& cont, Targs... val_args)
 {
-    return simple::Handle<ValueComparisonKey, Tr, Tc&, Targs...>
-		::operator()(cont, val_args...);
+    return BaseHandleType::operator()(cont, val_args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-ValueComparison<K, Tc, Tr, Targs...>::operator bool() const
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+ValueComparison<Tidc, Tc, Tr, Targs...>::operator bool() const
 {
-	return simple::Handle<ValueComparisonKey, Tr, Tc&, Targs...>::operator bool();
+	return BaseHandleType::operator bool();
 }
 
 }

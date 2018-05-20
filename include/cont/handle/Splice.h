@@ -5,6 +5,8 @@
 #include <functional>
 #include <cassert>
 
+#include "../../IdentifierConstant.h"
+#include "../../id_const/Validation.h"
 #include "../../Handle.h"
 #include "../../type/Switch.h"
 
@@ -50,8 +52,8 @@ static constexpr auto _IsHasFunctionPointer1(Tc c) ->
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionPointer1(...);
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-using _SwitchDefaultHandleType = simple::type::Switch<K, std::false_type,
+template<typename Tc, typename Tr, typename... Targs>
+using _SwitchDefaultHandleType = simple::type::Switch<std::false_type,
 	decltype(simple::_helper::_splice::
 		_IsHasFunctionMember0<Tc, Targs...>(std::declval<Tc>())),
 	decltype(simple::_helper::_splice::
@@ -65,63 +67,63 @@ using _SwitchDefaultHandleType = simple::type::Switch<K, std::false_type,
 	decltype(simple::_helper::_splice::
 		_IsHasFunctionPointer1<Tc, Targs...>(std::declval<Tc>()))>;
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 using _HasDefaultHandle = std::integral_constant<bool,
 	simple::_helper::_splice::
-		_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index !=
+		_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index !=
 	simple::_helper::_splice::
-		_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Size>;
+		_SwitchDefaultHandleType<Tc, Tr, Targs...>::Size>;
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_splice::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 0, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 0, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return c.splice(args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_splice::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 1, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 1, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return c.Splice(args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_splice::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 2, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 2, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return splice(c, args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_splice::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 3, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 3, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return Splice(c, args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_splice::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 4, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 4, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return splice(&c, args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_splice::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 5, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 5, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return Splice(&c, args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<!_HasDefaultHandle<K, Tc, Tr, Targs...>::value,
+template<typename Tc, typename Tr, typename... Targs>
+typename std::enable_if<!_HasDefaultHandle<Tc, Tr, Targs...>::value,
 	 Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
@@ -137,80 +139,84 @@ namespace cont
 namespace handle
 {
 
-struct SpliceKey;
+struct SpliceIDConst : simple::IdentifierConstant {};
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-class Splice : public simple::Handle<SpliceKey, Tr, Tc&, Targs...>
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+class Splice : public simple::Handle<simple::cont::handle::SpliceIDConst, 
+	Tr, Tc&, Targs...>
 {
 public:
-	typedef K KeyType;
-	typedef std::function<Tr(Tc&, Targs...)> HandleType;
+	typedef typename simple::id_const::Validation<Tidc>::Type IDConstType;
+	typedef typename simple::Handle<simple::cont::handle::SpliceIDConst, 
+		Tr, Tc&, Targs...>::FunctionType HandleType;
+private:
+	typedef simple::Handle<simple::cont::handle::SpliceIDConst, 
+		Tr, Tc&, Targs...> BaseHandleType;
 public:
 	Splice();
 	Splice(HandleType handle);
-	Splice(const Splice<K, Tc, Tr, Targs...>& cpy);
-	Splice(Splice<K, Tc, Tr, Targs...>&& mov);
+	Splice(const Splice<Tidc, Tc, Tr, Targs...>& cpy);
+	Splice(Splice<Tidc, Tc, Tr, Targs...>&& mov);
 public:
-	Splice<K, Tc, Tr, Targs...>& 
-		operator=(const Splice<K, Tc, Tr, Targs...>& cpy);
-	Splice<K, Tc, Tr, Targs...>&
+	Splice<Tidc, Tc, Tr, Targs...>& 
+		operator=(const Splice<Tidc, Tc, Tr, Targs...>& cpy);
+	Splice<Tidc, Tc, Tr, Targs...>&
 		operator=(HandleType handle);
 	Tr operator()(Tc& cont, Targs... val_args);
 	operator bool() const;
 };
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-Splice<K, Tc, Tr, Targs...>::Splice()
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+Splice<Tidc, Tc, Tr, Targs...>::Splice()
 {
 	if (simple::_helper::_splice::
-		_HasDefaultHandle<K, Tc, Tr, Targs...>::value)
-		Set(&simple::_helper::_splice::_DefaultHandle<K, Tc, Tr, Targs...>);
+		_HasDefaultHandle<Tc, Tr, Targs...>::value)
+		Set(&simple::_helper::_splice::_DefaultHandle<Tidc, Tc, Tr, Targs...>);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-Splice<K, Tc, Tr, Targs...>::Splice(HandleType handle) :
-	simple::Handle<SpliceKey, Tr, Tc&, Targs...>(handle)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+Splice<Tidc, Tc, Tr, Targs...>::Splice(HandleType handle) :
+	BaseHandleType(handle)
 {}  
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-Splice<K, Tc, Tr, Targs...>::
-	Splice(const Splice<K, Tc, Tr, Targs...>& cpy) :
-		simple::Handle<SpliceKey, Tr, Tc&, Targs...>(cpy)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+Splice<Tidc, Tc, Tr, Targs...>::
+	Splice(const Splice<Tidc, Tc, Tr, Targs...>& cpy) :
+		BaseHandleType(cpy)
 {}
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-Splice<K, Tc, Tr, Targs...>::
-	Splice(Splice<K, Tc, Tr, Targs...>&& mov) :
-		simple::Handle<SpliceKey, Tr, Tc&, Targs...>(mov)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+Splice<Tidc, Tc, Tr, Targs...>::
+	Splice(Splice<Tidc, Tc, Tr, Targs...>&& mov) :
+		BaseHandleType(mov)
 {}
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-Splice<K, Tc, Tr, Targs...>& Splice<K, Tc, Tr, Targs...>::
-	operator=(const Splice<K, Tc, Tr, Targs...>& cpy)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+Splice<Tidc, Tc, Tr, Targs...>& Splice<Tidc, Tc, Tr, Targs...>::
+	operator=(const Splice<Tidc, Tc, Tr, Targs...>& cpy)
 {
-	simple::Handle<SpliceKey, Tr, Tc&, Targs...>::operator=(cpy);
+	BaseHandleType::operator=(cpy);
 	return *this;
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-Splice<K, Tc, Tr, Targs...>& Splice<K, Tc, Tr, Targs...>::
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+Splice<Tidc, Tc, Tr, Targs...>& Splice<Tidc, Tc, Tr, Targs...>::
 	operator=(HandleType handle)
 {
-	simple::Handle<SpliceKey, Tr, Tc&, Targs...>::operator=(handle);
+	BaseHandleType::operator=(handle);
 	return *this;
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-Tr Splice<K, Tc, Tr, Targs...>::operator()(Tc& cont, Targs... val_args)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+Tr Splice<Tidc, Tc, Tr, Targs...>::operator()(Tc& cont, Targs... val_args)
 {
-    return simple::Handle<SpliceKey, Tr, Tc&, Targs...>
-		::operator()(cont, val_args...);
+    return BaseHandleType::operator()(cont, val_args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-Splice<K, Tc, Tr, Targs...>::operator bool() const
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+Splice<Tidc, Tc, Tr, Targs...>::operator bool() const
 {
-	return simple::Handle<SpliceKey, Tr, Tc&, Targs...>::operator bool();
+	return BaseHandleType::operator bool();
 }
 
 }

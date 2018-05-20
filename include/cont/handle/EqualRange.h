@@ -5,6 +5,8 @@
 #include <functional>
 #include <cassert>
 
+#include "../../IdentifierConstant.h"
+#include "../../id_const/Validation.h"
 #include "../../Handle.h"
 #include "../../type/Switch.h"
 
@@ -50,8 +52,8 @@ static constexpr auto _IsHasFunctionPointer1(Tc c) ->
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionPointer1(...);
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-using _SwitchDefaultHandleType = simple::type::Switch<K, std::false_type,
+template<typename Tc, typename Tr, typename... Targs>
+using _SwitchDefaultHandleType = simple::type::Switch<std::false_type,
 	decltype(simple::_helper::_equal_range::
 		_IsHasFunctionMember0<Tc, Targs...>(std::declval<Tc>())),
 	decltype(simple::_helper::_equal_range::
@@ -65,63 +67,63 @@ using _SwitchDefaultHandleType = simple::type::Switch<K, std::false_type,
 	decltype(simple::_helper::_equal_range::
 		_IsHasFunctionPointer1<Tc, Targs...>(std::declval<Tc>()))>;
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 using _HasDefaultHandle = std::integral_constant<bool,
 	simple::_helper::_equal_range::
-		_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index !=
+		_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index !=
 	simple::_helper::_equal_range::
-		_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Size>;
+		_SwitchDefaultHandleType<Tc, Tr, Targs...>::Size>;
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_equal_range::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 0, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 0, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return c.equal_range(args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_equal_range::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 1, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 1, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return c.EqualRange(args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_equal_range::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 2, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 2, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return equal_range(c, args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_equal_range::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 3, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 3, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return EqualRange(c, args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_equal_range::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 4, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 4, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return equal_range(&c, args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_equal_range::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 5, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 5, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return EqualRange(&c, args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<!_HasDefaultHandle<K, Tc, Tr, Targs...>::value,
+template<typename Tc, typename Tr, typename... Targs>
+typename std::enable_if<!_HasDefaultHandle<Tc, Tr, Targs...>::value,
 	 Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
@@ -137,81 +139,85 @@ namespace cont
 namespace handle
 {
 
-struct EqualRangeKey;
+struct EqualRangeIDConst : simple::IdentifierConstant {};
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-class EqualRange : public simple::Handle<EqualRangeKey, Tr, Tc&, Targs...>
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+class EqualRange : public simple::Handle<simple::cont::handle::
+	EqualRangeIDConst, Tr, Tc&, Targs...>
 {
 public:
-	typedef K KeyType;
-	typedef std::function<Tr(Tc&, Targs...)> HandleType;
+	typedef typename simple::id_const::Validation<Tidc>Type IDConstType;
+	typedef typename simple::Handle<simple::cont::handle::
+		EqualRangeIDConst, Tr, Tc&, Targs...>::FunctionType HandleType;
+private:
+	typedef simple::Handle<simple::cont::handle::
+		EqualRangeIDConst, Tr, Tc&, Targs...> BaseHandleType;
 public:
 	EqualRange();
 	EqualRange(HandleType handle);
-	EqualRange(const EqualRange<K, Tc, Tr, Targs...>& cpy);
-	EqualRange(EqualRange<K, Tc, Tr, Targs...>&& mov);
+	EqualRange(const EqualRange<Tidc, Tc, Tr, Targs...>& cpy);
+	EqualRange(EqualRange<Tidc, Tc, Tr, Targs...>&& mov);
 public:
-	EqualRange<K, Tc, Tr, Targs...>& 
-		operator=(const EqualRange<K, Tc, Tr, Targs...>& cpy);
-	EqualRange<K, Tc, Tr, Targs...>&
+	EqualRange<Tidc, Tc, Tr, Targs...>& 
+		operator=(const EqualRange<Tidc, Tc, Tr, Targs...>& cpy);
+	EqualRange<Tidc, Tc, Tr, Targs...>&
 		operator=(HandleType handle);
 	Tr operator()(Tc& cont, Targs... val_args);
 	operator bool() const;
 };
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-EqualRange<K, Tc, Tr, Targs...>::EqualRange()
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+EqualRange<Tidc, Tc, Tr, Targs...>::EqualRange()
 {
 	if (simple::_helper::_equal_range::
-        _HasDefaultHandle<K, Tc, Tr, Targs...>::value)
+        _HasDefaultHandle<Tc, Tr, Targs...>::value)
 		Set(&simple::_helper::_equal_range::
-            _DefaultHandle<K, Tc, Tr, Targs...>);
+            _DefaultHandle< Tc, Tr, Targs...>);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-EqualRange<K, Tc, Tr, Targs...>::EqualRange(HandleType handle) :
-	simple::Handle<EqualRangeKey, Tr, Tc&, Targs...>(handle)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+EqualRange<Tidc, Tc, Tr, Targs...>::EqualRange(HandleType handle) :
+	BaseHandleType(handle)
 {}  
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-EqualRange<K, Tc, Tr, Targs...>::
-	EqualRange(const EqualRange<K, Tc, Tr, Targs...>& cpy) :
-		simple::Handle<EqualRangeKey, Tr, Tc&, Targs...>(cpy)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+EqualRange<Tidc, Tc, Tr, Targs...>::
+	EqualRange(const EqualRange<Tidc, Tc, Tr, Targs...>& cpy) :
+		BaseHandleType(cpy)
 {}
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-EqualRange<K, Tc, Tr, Targs...>::
-	EqualRange(EqualRange<K, Tc, Tr, Targs...>&& mov) :
-		simple::Handle<EqualRangeKey, Tr, Tc&, Targs...>(mov)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+EqualRange<Tidc, Tc, Tr, Targs...>::
+	EqualRange(EqualRange<Tidc, Tc, Tr, Targs...>&& mov) :
+		BaseHandleType(mov)
 {}
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-EqualRange<K, Tc, Tr, Targs...>& EqualRange<K, Tc, Tr, Targs...>::
-	operator=(const EqualRange<K, Tc, Tr, Targs...>& cpy)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+EqualRange<Tidc, Tc, Tr, Targs...>& EqualRange<Tidc, Tc, Tr, Targs...>::
+	operator=(const EqualRange<Tidc, Tc, Tr, Targs...>& cpy)
 {
-	simple::Handle<EqualRangeKey, Tr, Tc&, Targs...>::operator=(cpy);
+	BaseHandleType::operator=(cpy);
 	return *this;
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-EqualRange<K, Tc, Tr, Targs...>& EqualRange<K, Tc, Tr, Targs...>::
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+EqualRange<Tidc, Tc, Tr, Targs...>& EqualRange<Tidc, Tc, Tr, Targs...>::
 	operator=(HandleType handle)
 {
-	simple::Handle<EqualRangeKey, Tr, Tc&, Targs...>::operator=(handle);
+	BaseHandleType::operator=(handle);
 	return *this;
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-Tr EqualRange<K, Tc, Tr, Targs...>::operator()(Tc& cont, Targs... val_args)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+Tr EqualRange<Tidc, Tc, Tr, Targs...>::operator()(Tc& cont, Targs... val_args)
 {
-    return simple::Handle<EqualRangeKey, Tr, Tc&, Targs...>
-		::operator()(cont, val_args...);
+    return BaseHandleType::operator()(cont, val_args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-EqualRange<K, Tc, Tr, Targs...>::operator bool() const
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+EqualRange<Tidc, Tc, Tr, Targs...>::operator bool() const
 {
-	return simple::Handle<EqualRangeKey, Tr, Tc&, Targs...>::operator bool();
+	return BaseHandleType::operator bool();
 }
 
 }

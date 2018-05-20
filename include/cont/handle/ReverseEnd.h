@@ -5,6 +5,8 @@
 #include <functional>
 #include <cassert>
 
+#include "../../IdentifierConstant.h"
+#include "../../id_const/Validation.h"
 #include "../../Handle.h"
 #include "../../type/Switch.h"
 
@@ -50,8 +52,8 @@ static constexpr auto _IsHasFunctionPointer1(Tc c) ->
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionPointer1(...);
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-using _SwitchDefaultHandleType = simple::type::Switch<K, std::false_type,
+template<typename Tc, typename Tr, typename... Targs>
+using _SwitchDefaultHandleType = simple::type::Switch<std::false_type,
 	decltype(simple::_helper::_reverse_end::
 		_IsHasFunctionMember0<Tc, Targs...>(std::declval<Tc>())),
 	decltype(simple::_helper::_reverse_end::
@@ -65,63 +67,63 @@ using _SwitchDefaultHandleType = simple::type::Switch<K, std::false_type,
 	decltype(simple::_helper::_reverse_end::
 		_IsHasFunctionPointer1<Tc, Targs...>(std::declval<Tc>()))>;
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 using _HasDefaultHandle = std::integral_constant<bool,
 	simple::_helper::_reverse_end::
-		_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index !=
+		_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index !=
 	simple::_helper::_reverse_end::
-		_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Size>;
+		_SwitchDefaultHandleType<Tc, Tr, Targs...>::Size>;
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_reverse_end::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 0, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 0, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return c.rend(args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_reverse_end::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 1, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 1, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return c.ReverseEnd(args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_reverse_end::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 2, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 2, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return rend(c, args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_reverse_end::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 3, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 3, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return ReverseEnd(c, args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_reverse_end::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 4, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 4, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return rend(&c, args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
+template<typename Tc, typename Tr, typename... Targs>
 typename std::enable_if<simple::_helper::_reverse_end::
-	_SwitchDefaultHandleType<K, Tc, Tr, Targs...>::Index == 5, Tr>::type
+	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 5, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return ReverseEnd(&c, args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<!_HasDefaultHandle<K, Tc, Tr, Targs...>::value,
+template<typename Tc, typename Tr, typename... Targs>
+typename std::enable_if<!_HasDefaultHandle<Tc, Tr, Targs...>::value,
 	 Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
@@ -137,81 +139,85 @@ namespace cont
 namespace handle
 {
 
-struct ReverseEndKey;
+struct ReverseEndIDConst : simple::IdentifierConstant {};
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-class ReverseEnd : public simple::Handle<ReverseEndKey, Tr, Tc&, Targs...>
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+class ReverseEnd : public simple::Handle<simple::cont::handle::
+	ReverseEndIDConst, Tr, Tc&, Targs...>
 {
 public:
-	typedef K KeyType;
-	typedef std::function<Tr(Tc&, Targs...)> HandleType;
+	typedef typename simple::id_const::Validation<Tidc>::Type IDConstType;
+	typedef typename simple::Handle<simple::cont::handle::
+		ReverseEndIDConst, Tr, Tc&, Targs...>::FunctionType HandleType;
+private:
+	typedef simple::Handle<simple::cont::handle::
+		ReverseEndIDConst, Tr, Tc&, Targs...> BaseHandleType;
 public:
 	ReverseEnd();
 	ReverseEnd(HandleType handle);
-	ReverseEnd(const ReverseEnd<K, Tc, Tr, Targs...>& cpy);
-	ReverseEnd(ReverseEnd<K, Tc, Tr, Targs...>&& mov);
+	ReverseEnd(const ReverseEnd<Tidc, Tc, Tr, Targs...>& cpy);
+	ReverseEnd(ReverseEnd<Tidc, Tc, Tr, Targs...>&& mov);
 public:
-	ReverseEnd<K, Tc, Tr, Targs...>& 
-		operator=(const ReverseEnd<K, Tc, Tr, Targs...>& cpy);
-	ReverseEnd<K, Tc, Tr, Targs...>&
+	ReverseEnd<Tidc, Tc, Tr, Targs...>& 
+		operator=(const ReverseEnd<Tidc, Tc, Tr, Targs...>& cpy);
+	ReverseEnd<Tidc, Tc, Tr, Targs...>&
 		operator=(HandleType handle);
 	Tr operator()(Tc& cont, Targs... val_args);
 	operator bool() const;
 };
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-ReverseEnd<K, Tc, Tr, Targs...>::ReverseEnd()
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+ReverseEnd<Tidc, Tc, Tr, Targs...>::ReverseEnd()
 {
 	if (simple::_helper::_reverse_end::
-        _HasDefaultHandle<K, Tc, Tr, Targs...>::value)
+        _HasDefaultHandle<Tc, Tr, Targs...>::value)
 		Set(&simple::_helper::_reverse_end::
-            _DefaultHandle<K, Tc, Tr, Targs...>);
+            _DefaultHandle<Tc, Tr, Targs...>);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-ReverseEnd<K, Tc, Tr, Targs...>::ReverseEnd(HandleType handle) :
-	simple::Handle<ReverseEndKey, Tr, Tc&, Targs...>(handle)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+ReverseEnd<Tidc, Tc, Tr, Targs...>::ReverseEnd(HandleType handle) :
+	BaseHandleType(handle)
 {}  
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-ReverseEnd<K, Tc, Tr, Targs...>::
-	ReverseEnd(const ReverseEnd<K, Tc, Tr, Targs...>& cpy) :
-		simple::Handle<ReverseEndKey, Tr, Tc&, Targs...>(cpy)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+ReverseEnd<Tidc, Tc, Tr, Targs...>::
+	ReverseEnd(const ReverseEnd<Tidc, Tc, Tr, Targs...>& cpy) :
+		BaseHandleType(cpy)
 {}
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-ReverseEnd<K, Tc, Tr, Targs...>::
-	ReverseEnd(ReverseEnd<K, Tc, Tr, Targs...>&& mov) :
-		simple::Handle<ReverseEndKey, Tr, Tc&, Targs...>(mov)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+ReverseEnd<Tidc, Tc, Tr, Targs...>::
+	ReverseEnd(ReverseEnd<Tidc, Tc, Tr, Targs...>&& mov) :
+		BaseHandleType(mov)
 {}
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-ReverseEnd<K, Tc, Tr, Targs...>& ReverseEnd<K, Tc, Tr, Targs...>::
-	operator=(const ReverseEnd<K, Tc, Tr, Targs...>& cpy)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+ReverseEnd<Tidc, Tc, Tr, Targs...>& ReverseEnd<Tidc, Tc, Tr, Targs...>::
+	operator=(const ReverseEnd<Tidc, Tc, Tr, Targs...>& cpy)
 {
-	simple::Handle<ReverseEndKey, Tr, Tc&, Targs...>::operator=(cpy);
+	BaseHandleType::operator=(cpy);
 	return *this;
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-ReverseEnd<K, Tc, Tr, Targs...>& ReverseEnd<K, Tc, Tr, Targs...>::
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+ReverseEnd<Tidc, Tc, Tr, Targs...>& ReverseEnd<Tidc, Tc, Tr, Targs...>::
 	operator=(HandleType handle)
 {
-	simple::Handle<ReverseEndKey, Tr, Tc&, Targs...>::operator=(handle);
+	BaseHandleType::operator=(handle);
 	return *this;
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-Tr ReverseEnd<K, Tc, Tr, Targs...>::operator()(Tc& cont, Targs... val_args)
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+Tr ReverseEnd<Tidc, Tc, Tr, Targs...>::operator()(Tc& cont, Targs... val_args)
 {
-    return simple::Handle<ReverseEndKey, Tr, Tc&, Targs...>
-		::operator()(cont, val_args...);
+    return BaseHandleType::operator()(cont, val_args...);
 }
 
-template<typename K, typename Tc, typename Tr, typename... Targs>
-ReverseEnd<K, Tc, Tr, Targs...>::operator bool() const
+template<typename Tidc, typename Tc, typename Tr, typename... Targs>
+ReverseEnd<Tidc, Tc, Tr, Targs...>::operator bool() const
 {
-	return simple::Handle<ReverseEndKey, Tr, Tc&, Targs...>::operator bool();
+	return BaseHandleType::operator bool();
 }
 
 }
