@@ -14,6 +14,10 @@ namespace simple
 {
 namespace _helper
 {
+namespace _cont
+{
+namespace _handle
+{
 namespace _bucket_count
 {
 template<typename Tc, typename... Targs>
@@ -53,81 +57,85 @@ template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionPointer1(...);
 
 template<typename Tc, typename Tr, typename... Targs>
-using _SwitchDefaultHandleType = simple::type::Switch<std::false_type,
-	decltype(simple::_helper::_bucket_count::
+using _SwitchDefaultHandle = simple::type::Switch<std::false_type,
+	decltype(simple::_helper::_cont::_handle::_bucket_count::
 		_IsHasFunctionMember0<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_bucket_count::
+	decltype(simple::_helper::_cont::_handle::_bucket_count::
 		_IsHasFunctionMember1<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_bucket_count::
+	decltype(simple::_helper::_cont::_handle::_bucket_count::
 		_IsHasFunctionReference0<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_bucket_count::
+	decltype(simple::_helper::_cont::_handle::_bucket_count::
 		_IsHasFunctionReference1<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_bucket_count::
+	decltype(simple::_helper::_cont::_handle::_bucket_count::
 		_IsHasFunctionPointer0<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_bucket_count::
+	decltype(simple::_helper::_cont::_handle::_bucket_count::
 		_IsHasFunctionPointer1<Tc, Targs...>(std::declval<Tc>()))>;
 
 template<typename Tc, typename Tr, typename... Targs>
 using _HasDefaultHandle = std::integral_constant<bool,
-	simple::_helper::_bucket_count::
-		_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index !=
-	simple::_helper::_bucket_count::
-		_SwitchDefaultHandleType<Tc, Tr, Targs...>::Size>;
+	simple::_helper::_cont::_handle::_bucket_count::
+		_SwitchDefaultHandle<Tc, Tr, Targs...>::Index !=
+	simple::_helper::_cont::_handle::_bucket_count::
+		_SwitchDefaultHandle<Tc, Tr, Targs...>::Size>;
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_bucket_count::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 0, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_bucket_count::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 0, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return c.bucket_count(args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_bucket_count::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 1, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_bucket_count::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 1, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return c.BucketCount(args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_bucket_count::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 2, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_bucket_count::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 2, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return bucket_count(c, args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_bucket_count::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 3, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_bucket_count::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 3, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return BucketCount(c, args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_bucket_count::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 4, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_bucket_count::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 4, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return bucket_count(&c, args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_bucket_count::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 5, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_bucket_count::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 5, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return BucketCount(&c, args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<!_HasDefaultHandle<Tc, Tr, Targs...>::value,
-	 Tr>::type
+typename std::enable_if<!simple::_helper::_cont::_handle::_bucket_count::
+	_HasDefaultHandle<Tc, Tr, Targs...>::value, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	assert(!"do not have handle bucket_count or BucketCount function ");
+}
+
+}
+
 }
 
 }
@@ -169,10 +177,10 @@ public:
 template<typename Tidc, typename Tc, typename Tr, typename... Targs>
 BucketCount<Tidc, Tc, Tr, Targs...>::BucketCount()
 {
-	if (simple::_helper::_bucket_count::
+	if (simple::_helper::_cont::_handle::_bucket_count::
 		_HasDefaultHandle<Tc, Tr, Targs...>::value)
-		Set(&simple::_helper::_bucket_count::
-            _DefaultHandle<Tc, Tr, Targs...>);
+			Set(&simple::_helper::_cont::_handle::_bucket_count::
+            	_DefaultHandle<Tc, Tr, Targs...>);
 }
 
 template<typename Tidc, typename Tc, typename Tr, typename... Targs>

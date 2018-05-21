@@ -14,6 +14,10 @@ namespace simple
 {
 namespace _helper
 {
+namespace _cont
+{
+namespace _handle
+{
 namespace _push_back
 {
 template<typename Tc, typename... Targs>
@@ -53,81 +57,85 @@ template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionPointer1(...);
 
 template<typename Tc, typename Tr, typename... Targs>
-using _SwitchDefaultHandleType = simple::type::Switch<std::false_type,
-	decltype(simple::_helper::_push_back::
+using _SwitchDefaultHandle = simple::type::Switch<std::false_type,
+	decltype(simple::_helper::_cont::_handle::_push_back::
 		_IsHasFunctionMember0<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_push_back::
+	decltype(simple::_helper::_cont::_handle::_push_back::
 		_IsHasFunctionMember1<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_push_back::
+	decltype(simple::_helper::_cont::_handle::_push_back::
 		_IsHasFunctionReference0<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_push_back::
+	decltype(simple::_helper::_cont::_handle::_push_back::
 		_IsHasFunctionReference1<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_push_back::
+	decltype(simple::_helper::_cont::_handle::_push_back::
 		_IsHasFunctionPointer0<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_push_back::
+	decltype(simple::_helper::_cont::_handle::_push_back::
 		_IsHasFunctionPointer1<Tc, Targs...>(std::declval<Tc>()))>;
 
 template<typename Tc, typename Tr, typename... Targs>
 using _HasDefaultHandle = std::integral_constant<bool,
-	simple::_helper::_push_back::
-		_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index !=
-	simple::_helper::_push_back::
-		_SwitchDefaultHandleType<Tc, Tr, Targs...>::Size>;
+	simple::_helper::_cont::_handle::_push_back::
+		_SwitchDefaultHandle<Tc, Tr, Targs...>::Index !=
+	simple::_helper::_cont::_handle::_push_back::
+		_SwitchDefaultHandle<Tc, Tr, Targs...>::Size>;
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_push_back::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 0, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_push_back::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 0, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return c.push_back(args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_push_back::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 1, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_push_back::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 1, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return c.PushBack(args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_push_back::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 2, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_push_back::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 2, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return push_back(c, args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_push_back::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 3, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_push_back::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 3, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return PushBack(c, args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_push_back::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 4, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_push_back::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 4, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return push_back(&c, args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_push_back::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 5, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_push_back::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 5, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return PushBack(&c, args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<!_HasDefaultHandle<Tc, Tr, Targs...>::value,
-	 Tr>::type
+typename std::enable_if<!simple::_helper::_cont::_handle::_push_back::
+	_HasDefaultHandle<Tc, Tr, Targs...>::value, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	assert(!"do not have handle push_back or PushBack function ");
+}
+
+}
+
 }
 
 }
@@ -169,10 +177,10 @@ public:
 template<typename Tidc, typename Tc, typename Tr, typename... Targs>
 PushBack<Tidc, Tc, Tr, Targs...>::PushBack()
 {
-	if (simple::_helper::_push_back::
+	if (simple::_helper::_cont::_handle::_push_back::
     	_HasDefaultHandle<Tc, Tr, Targs...>::value)
-		Set(&simple::_helper::_push_back::
-            _DefaultHandle<Tc, Tr, Targs...>);
+			Set(&simple::_helper::_cont::_handle::_push_back::
+            	_DefaultHandle<Tc, Tr, Targs...>);
 }
 
 template<typename Tidc, typename Tc, typename Tr, typename... Targs>

@@ -14,6 +14,10 @@ namespace simple
 {
 namespace _helper
 {
+namespace _cont
+{
+namespace _handle
+{
 namespace _key_equivalence
 {
 template<typename Tc, typename... Targs>
@@ -53,81 +57,85 @@ template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionPointer1(...);
 
 template<typename Tc, typename Tr, typename... Targs>
-using _SwitchDefaultHandleType = simple::type::Switch<std::false_type,
-	decltype(simple::_helper::_key_equivalence::
+using _SwitchDefaultHandle = simple::type::Switch<std::false_type,
+	decltype(simple::_helper::_cont::_handle::_key_equivalence::
 		_IsHasFunctionMember0<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_key_equivalence::
+	decltype(simple::_helper::_cont::_handle::_key_equivalence::
 		_IsHasFunctionMember1<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_key_equivalence::
+	decltype(simple::_helper::_cont::_handle::_key_equivalence::
 		_IsHasFunctionReference0<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_key_equivalence::
+	decltype(simple::_helper::_cont::_handle::_key_equivalence::
 		_IsHasFunctionReference1<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_key_equivalence::
+	decltype(simple::_helper::_cont::_handle::_key_equivalence::
 		_IsHasFunctionPointer0<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_key_equivalence::
+	decltype(simple::_helper::_cont::_handle::_key_equivalence::
 		_IsHasFunctionPointer1<Tc, Targs...>(std::declval<Tc>()))>;
 
 template<typename Tc, typename Tr, typename... Targs>
 using _HasDefaultHandle = std::integral_constant<bool,
-	simple::_helper::_key_equivalence::
-		_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index !=
-	simple::_helper::_key_equivalence::
-		_SwitchDefaultHandleType<Tc, Tr, Targs...>::Size>;
+	simple::_helper::_cont::_handle::_key_equivalence::
+		_SwitchDefaultHandle<Tc, Tr, Targs...>::Index !=
+	simple::_helper::_cont::_handle::_key_equivalence::
+		_SwitchDefaultHandle<Tc, Tr, Targs...>::Size>;
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_key_equivalence::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 0, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_key_equivalence::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 0, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return c.key_eq(args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_key_equivalence::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 1, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_key_equivalence::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 1, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return c.KeyEquivalence(args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_key_equivalence::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 2, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_key_equivalence::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 2, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return key_eq(c, args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_key_equivalence::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 3, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_key_equivalence::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 3, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return KeyEquivalence(c, args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_key_equivalence::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 4, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_key_equivalence::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 4, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return key_eq(&c, args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_key_equivalence::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 5, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_key_equivalence::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 5, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return KeyEquivalence(&c, args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<!_HasDefaultHandle<Tc, Tr, Targs...>::value,
-	 Tr>::type
+typename std::enable_if<!simple::_helper::_cont::_handle::_key_equivalence::
+	_HasDefaultHandle<Tc, Tr, Targs...>::value, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	assert(!"do not have handle key_eq or KeyEquivalence function ");
+}
+
+}
+
 }
 
 }
@@ -169,9 +177,9 @@ public:
 template<typename Tidc, typename Tc, typename Tr, typename... Targs>
 KeyEquivalence<Tidc, Tc, Tr, Targs...>::KeyEquivalence()
 {
-	if (simple::_helper::_key_equivalence::
+	if (simple::_helper::_cont::_handle::_key_equivalence::
         _HasDefaultHandle<Tc, Tr, Targs...>::value)
-		Set(&simple::_helper::_key_equivalence::
+		Set(&simple::_helper::_cont::_handle::_key_equivalence::
             _DefaultHandle<Tc, Tr, Targs...>);
 }
 

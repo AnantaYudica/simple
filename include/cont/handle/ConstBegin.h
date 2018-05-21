@@ -14,6 +14,10 @@ namespace simple
 {
 namespace _helper
 {
+namespace _cont
+{
+namespace _handle
+{
 namespace _const_begin
 {
 template<typename Tc, typename... Targs>
@@ -53,81 +57,85 @@ template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionPointer1(...);
 
 template<typename Tc, typename Tr, typename... Targs>
-using _SwitchDefaultHandleType = simple::type::Switch<std::false_type,
-	decltype(simple::_helper::_const_begin::
+using _SwitchDefaultHandle = simple::type::Switch<std::false_type,
+	decltype(simple::_helper::_cont::_handle::_const_begin::
 		_IsHasFunctionMember0<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_const_begin::
+	decltype(simple::_helper::_cont::_handle::_const_begin::
 		_IsHasFunctionMember1<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_const_begin::
+	decltype(simple::_helper::_cont::_handle::_const_begin::
 		_IsHasFunctionReference0<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_const_begin::
+	decltype(simple::_helper::_cont::_handle::_const_begin::
 		_IsHasFunctionReference1<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_const_begin::
+	decltype(simple::_helper::_cont::_handle::_const_begin::
 		_IsHasFunctionPointer0<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_const_begin::
+	decltype(simple::_helper::_cont::_handle::_const_begin::
 		_IsHasFunctionPointer1<Tc, Targs...>(std::declval<Tc>()))>;
 
 template<typename Tc, typename Tr, typename... Targs>
 using _HasDefaultHandle = std::integral_constant<bool,
-	simple::_helper::_const_begin::
-		_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index !=
-	simple::_helper::_const_begin::
-		_SwitchDefaultHandleType<Tc, Tr, Targs...>::Size>;
+	simple::_helper::_cont::_handle::_const_begin::
+		_SwitchDefaultHandle<Tc, Tr, Targs...>::Index !=
+	simple::_helper::_cont::_handle::_const_begin::
+		_SwitchDefaultHandle<Tc, Tr, Targs...>::Size>;
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_const_begin::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 0, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_const_begin::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 0, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return c.cbegin(args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_const_begin::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 1, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_const_begin::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 1, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return c.ConstBegin(args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_const_begin::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 2, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_const_begin::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 2, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return cbegin(c, args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_const_begin::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 3, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_const_begin::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 3, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return ConstBegin(c, args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_const_begin::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 4, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_const_begin::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 4, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return cbegin(&c, args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_const_begin::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 5, Tr>::type
+typename std::enable_if<simple::_helper::_cont::_handle::_const_begin::
+	_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 5, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return ConstBegin(&c, args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<!_HasDefaultHandle<Tc, Tr, Targs...>::value,
-	Tr>::type
+typename std::enable_if<!simple::_helper::_cont::_handle::_const_begin::
+	_HasDefaultHandle<Tc, Tr, Targs...>::value, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	assert(!"do not have handle cbegin or ConstBegin function ");
+}
+
+}
+
 }
 
 }
@@ -169,10 +177,10 @@ public:
 template<typename Tidc, typename Tc, typename Tr, typename... Targs>
 ConstBegin<Tidc, Tc, Tr, Targs...>::ConstBegin()
 {
-	if (simple::_helper::_const_begin::
+	if (simple::_helper::_cont::_handle::_const_begin::
 		_HasDefaultHandle<Tc, Tr, Targs...>::value)
-		Set(&simple::_helper::_const_begin::
-			_DefaultHandle<Tc, Tr, Targs...>);
+			Set(&simple::_helper::_cont::_handle::_const_begin::
+				_DefaultHandle<Tc, Tr, Targs...>);
 }
 
 template<typename Tidc, typename Tc, typename Tr, typename... Targs>

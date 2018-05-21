@@ -14,6 +14,10 @@ namespace simple
 {
 namespace _helper
 {
+namespace _cont
+{
+namespace _handle
+{
 namespace _maximum_bucket_count
 {
 template<typename Tc, typename... Targs>
@@ -36,7 +40,8 @@ static constexpr std::false_type _IsHasFunctionReference0(...);
 
 template<typename Tc, typename... Targs>
 static constexpr auto _IsHasFunctionReference1(Tc c) ->
-	decltype(MaximumBucketCount(c, std::declval<Targs>()...), std::true_type());
+	decltype(MaximumBucketCount(c, std::declval<Targs>()...), 
+		std::true_type());
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionReference1(...);
 
@@ -48,87 +53,99 @@ static constexpr std::false_type _IsHasFunctionPointer0(...);
 
 template<typename Tc, typename... Targs>
 static constexpr auto _IsHasFunctionPointer1(Tc c) ->
-	decltype(MaximumBucketCount(&c, std::declval<Targs>()...), std::true_type());
+	decltype(MaximumBucketCount(&c, std::declval<Targs>()...), 
+		std::true_type());
 template<typename Tc, typename... Targs>
 static constexpr std::false_type _IsHasFunctionPointer1(...);
 
 template<typename Tc, typename Tr, typename... Targs>
-using _SwitchDefaultHandleType = simple::type::Switch<std::false_type,
-	decltype(simple::_helper::_maximum_bucket_count::
+using _SwitchDefaultHandle = simple::type::Switch<std::false_type,
+	decltype(simple::_helper::_cont::_handle::_maximum_bucket_count::
 		_IsHasFunctionMember0<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_maximum_bucket_count::
+	decltype(simple::_helper::_cont::_handle::_maximum_bucket_count::
 		_IsHasFunctionMember1<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_maximum_bucket_count::
+	decltype(simple::_helper::_cont::_handle::_maximum_bucket_count::
 		_IsHasFunctionReference0<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_maximum_bucket_count::
+	decltype(simple::_helper::_cont::_handle::_maximum_bucket_count::
 		_IsHasFunctionReference1<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_maximum_bucket_count::
+	decltype(simple::_helper::_cont::_handle::_maximum_bucket_count::
 		_IsHasFunctionPointer0<Tc, Targs...>(std::declval<Tc>())),
-	decltype(simple::_helper::_maximum_bucket_count::
+	decltype(simple::_helper::_cont::_handle::_maximum_bucket_count::
 		_IsHasFunctionPointer1<Tc, Targs...>(std::declval<Tc>()))>;
 
 template<typename Tc, typename Tr, typename... Targs>
 using _HasDefaultHandle = std::integral_constant<bool,
-	simple::_helper::_maximum_bucket_count::
-		_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index !=
-	simple::_helper::_maximum_bucket_count::
-		_SwitchDefaultHandleType<Tc, Tr, Targs...>::Size>;
+	simple::_helper::_cont::_handle::_maximum_bucket_count::
+		_SwitchDefaultHandle<Tc, Tr, Targs...>::Index !=
+	simple::_helper::_cont::_handle::_maximum_bucket_count::
+		_SwitchDefaultHandle<Tc, Tr, Targs...>::Size>;
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_maximum_bucket_count::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 0, Tr>::type
+typename std::enable_if<
+	simple::_helper::_cont::_handle::_maximum_bucket_count::
+		_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 0, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return c.max_bucket_count(args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_maximum_bucket_count::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 1, Tr>::type
+typename std::enable_if<
+	simple::_helper::_cont::_handle::_maximum_bucket_count::
+		_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 1, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return c.MaximumBucketCount(args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_maximum_bucket_count::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 2, Tr>::type
+typename std::enable_if<
+	simple::_helper::_cont::_handle::_maximum_bucket_count::
+		_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 2, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return max_bucket_count(c, args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_maximum_bucket_count::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 3, Tr>::type
+typename std::enable_if<
+	simple::_helper::_cont::_handle::_maximum_bucket_count::
+		_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 3, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return MaximumBucketCount(c, args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_maximum_bucket_count::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 4, Tr>::type
+typename std::enable_if<
+	simple::_helper::_cont::_handle::_maximum_bucket_count::
+		_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 4, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return max_bucket_count(&c, args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<simple::_helper::_maximum_bucket_count::
-	_SwitchDefaultHandleType<Tc, Tr, Targs...>::Index == 5, Tr>::type
+typename std::enable_if<
+	simple::_helper::_cont::_handle::_maximum_bucket_count::
+		_SwitchDefaultHandle<Tc, Tr, Targs...>::Index == 5, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	return MaximumBucketCount(&c, args...);
 }
 
 template<typename Tc, typename Tr, typename... Targs>
-typename std::enable_if<!_HasDefaultHandle<Tc, Tr, Targs...>::value,
-	 Tr>::type
+typename std::enable_if<
+	!simple::_helper::_cont::_handle::_maximum_bucket_count::
+		_HasDefaultHandle<Tc, Tr, Targs...>::value, Tr>::type
 	_DefaultHandle(Tc& c, Targs... args)
 {
 	assert(!"do not have handle max_bucket_count or "
 		"MaximumBucketCount function ");
+}
+
+}
+
 }
 
 }
@@ -170,15 +187,16 @@ public:
 template<typename Tidc, typename Tc, typename Tr, typename... Targs>
 MaximumBucketCount<Tidc, Tc, Tr, Targs...>::MaximumBucketCount()
 {
-	if (simple::_helper::maximum_bucket_count::
+	if (simple::_helper::_cont::_handle::maximum_bucket_count::
         _HasDefaultHandle<Tc, Tr, Targs...>::value)
-		Set(&simple::_helper::maximum_bucket_count::
-            _DefaultHandle<Tc, Tr, Targs...>);
+			Set(&simple::_helper::_cont::_handle::maximum_bucket_count::
+            	_DefaultHandle<Tc, Tr, Targs...>);
 }
 
 template<typename Tidc, typename Tc, typename Tr, typename... Targs>
-MaximumBucketCount<Tidc, Tc, Tr, Targs...>::MaximumBucketCount(HandleType handle) :
-	BaseHandleType(handle)
+MaximumBucketCount<Tidc, Tc, Tr, Targs...>::
+	MaximumBucketCount(HandleType handle) :
+		BaseHandleType(handle)
 {}  
 
 template<typename Tidc, typename Tc, typename Tr, typename... Targs>
@@ -194,23 +212,26 @@ MaximumBucketCount<Tidc, Tc, Tr, Targs...>::
 {}
 
 template<typename Tidc, typename Tc, typename Tr, typename... Targs>
-MaximumBucketCount<Tidc, Tc, Tr, Targs...>& MaximumBucketCount<Tidc, Tc, Tr, Targs...>::
-	operator=(const MaximumBucketCount<Tidc, Tc, Tr, Targs...>& cpy)
+MaximumBucketCount<Tidc, Tc, Tr, Targs...>& 
+	MaximumBucketCount<Tidc, Tc, Tr, Targs...>::
+		operator=(const MaximumBucketCount<Tidc, Tc, Tr, Targs...>& cpy)
 {
 	BaseHandleType::operator=(cpy);
 	return *this;
 }
 
 template<typename Tidc, typename Tc, typename Tr, typename... Targs>
-MaximumBucketCount<Tidc, Tc, Tr, Targs...>& MaximumBucketCount<Tidc, Tc, Tr, Targs...>::
-	operator=(HandleType handle)
+MaximumBucketCount<Tidc, Tc, Tr, Targs...>& 
+	MaximumBucketCount<Tidc, Tc, Tr, Targs...>::
+		operator=(HandleType handle)
 {
 	BaseHandleType::operator=(handle);
 	return *this;
 }
 
 template<typename Tidc, typename Tc, typename Tr, typename... Targs>
-Tr MaximumBucketCount<Tidc, Tc, Tr, Targs...>::operator()(Tc& cont, Targs... val_args)
+Tr MaximumBucketCount<Tidc, Tc, Tr, Targs...>::
+	operator()(Tc& cont, Targs... val_args)
 {
     return BaseHandleType::operator()(cont, val_args...);
 }
