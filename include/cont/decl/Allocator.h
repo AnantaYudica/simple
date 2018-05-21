@@ -14,13 +14,13 @@ namespace _decl
 
 template<typename T>
 constexpr auto _GetAllocator0(T) ->
-    delctype(std::declval<T::allocator_type>());
+    decltype(std::declval<T::allocator_type>());
 template<typename T>
 constexpr void _GetAllocator0(...);
 
 template<typename T>
 constexpr auto _GetAllocator1(T) ->
-    delctype(std::declval<T::AllocatorType>());
+    decltype(std::declval<T::AllocatorType>());
 template<typename T>
 constexpr void _GetAllocator1(...);
 

@@ -28,7 +28,7 @@ template<typename T>
 using _SwitchContainer = simple::type::Switch<void,
     decltype(simple::_helper::_cont::_decl::
         _GetContainer0<T>(std::declval<T>())),
-    delctype(simple::_helper::_cont::_decl::
+    decltype(simple::_helper::_cont::_decl::
         _GetContainer1<T>(std::declval<T>()))>;
 
 template<bool, typename T>
