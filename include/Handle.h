@@ -23,9 +23,10 @@ public:
     Handle(const Handle<Tidc, Tr, Targs...>& cpy);
     Handle(Handle<Tidc, Tr, Targs...>&& mov);
 public:
-    void Set(FunctionType handle);
+	void Set(Tr(&func_ptr)(Targs...));
+    void Set(const FunctionType& handle);
 public:
-    Handle<Tidc, Tr, Targs...>& operator=(FunctionType handle);
+    Handle<Tidc, Tr, Targs...>& operator=(const FunctionType& handle);
     Handle<Tidc, Tr, Targs...>& operator=(const Handle<Tidc, Tr, Targs...>& cpy);
     Tr operator()(Targs... args);
     operator bool() const;
@@ -52,14 +53,20 @@ Handle<Tidc, Tr, Targs...>::Handle(Handle<Tidc, Tr, Targs...>&& mov) :
 {}
 
 template<typename Tidc, typename Tr, typename... Targs>
-void Handle<Tidc, Tr, Targs...>::Set(FunctionType handle)
+void Handle<Tidc, Tr, Targs...>::Set(Tr(&func_ref)(Targs...))
+{
+	m_handle = FunctionType(func_ref);
+}
+
+template<typename Tidc, typename Tr, typename... Targs>
+void Handle<Tidc, Tr, Targs...>::Set(const FunctionType& handle)
 {
     m_handle = handle;
 }
 
 template<typename Tidc, typename Tr, typename... Targs>
 Handle<Tidc, Tr, Targs...>& 
-    Handle<Tidc, Tr, Targs...>::operator=(FunctionType handle)
+    Handle<Tidc, Tr, Targs...>::operator=(const FunctionType& handle)
 {
     m_handle = handle;
     return *this;
